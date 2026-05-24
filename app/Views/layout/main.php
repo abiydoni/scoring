@@ -468,6 +468,13 @@
         }
 
         /* High-Contrast Interactive Scoring Grid in Light Mode */
+        /* Additional light mode slate utility overrides */
+        .light-mode .bg-slate-850 {
+            background-color: var(--bg-card) !important;
+        }
+        .light-mode .bg-slate-950 {
+            background-color: var(--bg-card) !important;
+        }
         /* Generic Slate Utility Overrides for Light Mode */
         .light-mode [class*="bg-slate-"] {
             background-color: var(--bg-card) !important;
