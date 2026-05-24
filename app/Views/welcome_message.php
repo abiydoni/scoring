@@ -1,4 +1,18 @@
-<!DOCTYPE html>
+<?php $this->extend('layout/main'); ?>
+<?php $this->section('content'); ?>
+<div class="p-6 max-w-2xl mx-auto">
+    <h1 class="text-3xl font-bold text-slate-900">Selamat Datang di Scoring App</h1>
+    <p class="mt-4 text-slate-800">Aplikasi ini membantu mengelola atlet dan skor panahan. Gunakan menu di atas untuk menavigasi ke fitur-fitur utama.</p>
+    <p class="mt-2 text-slate-800">Jika Anda melihat tampilan tetap gelap, pastikan tombol tema di header tidak berubah dan refresh halaman.</p>
+</div>
+<?php $this->endSection(); ?>
+<?php $this->section('content'); ?>
+<div class="p-6 max-w-2xl mx-auto">
+    <h1 class="text-3xl font-bold text-slate-900">Selamat Datang di Scoring App</h1>
+    <p class="mt-4 text-slate-800">Aplikasi ini membantu mengelola atlet dan skor panahan. Gunakan menu di atas untuk menavigasi ke fitur-fitur utama.</p>
+    <p class="mt-2 text-slate-800">Jika Anda melihat tampilan tetap gelap, pastikan tombol tema di header tidak berubah dan refresh halaman.</p>
+</div>
+<?php $this->endSection(); ?>
 <html lang="en">
 <head>
     <meta charset="UTF-8">

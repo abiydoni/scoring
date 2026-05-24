@@ -15,7 +15,7 @@
 </div>
 <!-- Athlete Form Modal -->
 <div id="athlete-form-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/40 backdrop-blur-sm">
-    <div class="bg-slate-800/90 p-6 rounded-3xl max-w-md w-full mx-4">
+    <div class="bg-slate-800/90 light-modal p-6 rounded-3xl max-w-md w-full mx-4">
         <h3 id="form-modal-title" class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-4">Tambah Atlet Baru</h3>
         <form id="athlete-form" action="/anggota/store" method="POST">
             <div class="space-y-3.5">
@@ -170,8 +170,8 @@
             title: 'Hapus Atlet?',
             html: `Apakah Anda yakin ingin menghapus profil atlet <strong>${name}</strong>?<br><br><span class="text-rose-400 text-[10px] font-bold uppercase tracking-wider">Peringatan:</span> <span class="text-slate-400 text-xs">Semua riwayat scoring game atlet ini juga akan ikut terhapus secara permanen.</span>`,
             icon: 'warning',
-            background: '#1e293b',
-            color: '#f8fafc',
+            background: (document.body.classList.contains('light-mode') ? '#ffffff' : '#1e293b'),
+            color: (document.body.classList.contains('light-mode') ? '#0f172a' : '#f8fafc'),
             showCancelButton: true,
             confirmButtonColor: '#e11d48', // rose-600
             cancelButtonColor: '#475569',  // slate-600

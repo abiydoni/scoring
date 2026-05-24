@@ -3,7 +3,7 @@
 <?= $this->section('content') ?>
 
 <!-- Welcome Panel -->
-<div class="mb-6 p-5 bg-gradient-to-br from-brand-600 to-indigo-700 rounded-3xl relative overflow-hidden shadow-lg shadow-brand-500/10 border border-brand-500/20 select-none">
+<div class="mb-6 p-5 bg-gradient-to-br from-brand-600 to-indigo-700 rounded-3xl relative overflow-hidden shadow-lg shadow-brand-500/10 border border-brand-500/20 select-none light-panel">
     <!-- Abstract Design Background Shapes -->
     <div class="absolute -right-10 -bottom-10 w-36 h-36 bg-white/10 rounded-full blur-2xl"></div>
     <div class="absolute -left-6 -top-6 w-24 h-24 bg-brand-400/20 rounded-full blur-xl"></div>
@@ -142,8 +142,8 @@
                 datasets: [{
                     label: 'Skor Total',
                     data: scores,
-                    borderColor: '#8b5cf6', // brand-500 purple
-                    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                    borderColor: (document.body.classList.contains('light-mode') ? '#8b5cf6' : '#8b5cf6'), // keep brand color
+                    backgroundColor: (document.body.classList.contains('light-mode') ? 'rgba(139, 92, 246, 0.1)' : 'rgba(139, 92, 246, 0.1)'),
                     borderWidth: 2.5,
                     pointBackgroundColor: '#8b5cf6',
                     pointBorderColor: '#0f172a',
@@ -162,11 +162,11 @@
                         display: false
                     },
                     tooltip: {
-                        backgroundColor: '#1e293b',
-                        titleColor: '#f8fafc',
-                        bodyColor: '#cbd5e1',
+                        backgroundColor: (document.body.classList.contains('light-mode') ? '#ffffff' : '#1e293b'),
+                        titleColor: (document.body.classList.contains('light-mode') ? '#0f172a' : '#f8fafc'),
+                        bodyColor: (document.body.classList.contains('light-mode') ? '#334155' : '#cbd5e1'),
                         borderWidth: 1,
-                        borderColor: '#334155',
+                        borderColor: (document.body.classList.contains('light-mode') ? '#e5e7eb' : '#334155'),
                         padding: 8,
                         boxPadding: 4,
                         cornerRadius: 8,
@@ -184,7 +184,7 @@
                 scales: {
                     y: {
                         grid: {
-                            color: 'rgba(255, 255, 255, 0.05)',
+                            color: (document.body.classList.contains('light-mode') ? '#e5e7eb' : 'rgba(255, 255, 255, 0.05)')
                         },
                         ticks: {
                             color: '#64748b',

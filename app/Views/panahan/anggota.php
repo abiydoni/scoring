@@ -24,7 +24,7 @@
 </div>
 
 <!-- New Game Drawer Panel (Hidden by default) -->
-<div id="new-game-panel" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/40 backdrop-blur-sm"><div class="bg-slate-800/90 p-6 rounded-3xl max-w-md w-full mx-4">
+<div id="new-game-panel" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/40 backdrop-blur-sm"><div class="bg-slate-800/90 light-modal p-6 rounded-3xl max-w-md w-full mx-4">
     <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-4">Buat Permainan Baru</h3>
     
     <form onsubmit="createNewGame(event)">

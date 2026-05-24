@@ -92,12 +92,32 @@
         }
 
         .light-mode {
+    /* Light Mode (Premium Ice Blue & Clean Slate) */
+    --bg-body: #fafafa;
+    --bg-frame: #ffffff;
+    --bg-viewport: linear-gradient(180deg, #ffffff 0%, #f8fafc 55%, #fafafa 100%);
+    --bg-header: rgba(255, 255, 255, 0.96);
+    --bg-nav: rgba(255, 255, 255, 0.98);
+    --border-color: rgba(15, 23, 42, 0.08);
+    --border-header: rgba(15, 23, 42, 0.06);
+    --border-nav: rgba(15, 23, 42, 0.05);
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+    --bg-card: #ffffff;
+    --bg-card-hover: #f8fafc;
+    --border-card: rgba(15, 23, 42, 0.1);
+    --border-card-hover: rgba(15, 23, 42, 0.2);
+    --bg-input: #ffffff;
+    --text-input: #0f172a;
+    --bg-icon-box: rgba(226, 232, 240, 0.6);
+}
             /* Light Mode (Premium Ice Blue & Clean Slate) */
-            --bg-body: #f1f5f9;
+            --bg-body: #fafafa;
             --bg-frame: #ffffff;
-            --bg-viewport: linear-gradient(180deg, #ffffff 0%, #f8fafc 55%, #f1f5f9 100%);
-            --bg-header: rgba(255, 255, 255, 0.92);
-            --bg-nav: rgba(248, 250, 252, 0.96);
+            --bg-viewport: linear-gradient(180deg, #ffffff 0%, #f8fafc 55%, #fafafa 100%);
+            --bg-header: rgba(255, 255, 255, 0.96);
+            --bg-nav: rgba(255, 255, 255, 0.98);
             --border-color: rgba(15, 23, 42, 0.08);
             --border-header: rgba(15, 23, 42, 0.06);
             --border-nav: rgba(15, 23, 42, 0.05);
@@ -394,11 +414,44 @@
         }
 
         /* Small icon backgrounds inside cards */
-        .light-mode .bg-slate-800, 
-        .light-mode .bg-slate-900,
+        .light-mode .light-panel {
+            background-color: var(--bg-card) !important;
+            border-color: var(--border-card) !important;
+            color: var(--text-primary) !important;
+        }
+
+        /* Light mode: force any slate background utilities to use the page background */
+/* Light mode: force any Tailwind slate background utility to use the light page background */
+.light-mode [class*="bg-slate-"] {
+    background-color: var(--bg-body) !important;
+    color: var(--text-primary) !important;
+    transition: background-color 0.25s ease !important;
+}
+.light-mode .bg-slate-900,
+.light-mode .bg-slate-800\/60,
+.light-mode .bg-slate-800\/20,
+.light-mode .bg-slate-800\/60 {
+    /* Override dark slate backgrounds with light mode palette */
+    background-color: var(--bg-body) !important;
+    color: var(--text-primary) !important;
+    transition: background-color 0.25s ease !important;
+} 
+        /* Removed redundant slate background overrides – now all .bg-slate-* use the page background via the unified rule above */
+.light-mode .bg-slate-800\/60 {
+    /* Use overall page background for light mode */
+    background-color: var(--bg-body) !important;
+    color: var(--text-primary) !important;
+    transition: background-color 0.25s ease !important;
+}
+.light-mode .bg-slate-800\/60 {
+    /* Use overall page background for light mode */
+    background-color: var(--bg-body) !important;
+    color: var(--text-primary) !important;
+    transition: background-color 0.25s ease !important;
+}
         .light-mode .bg-slate-800\/60 {
             /* Override dark slate backgrounds with light mode palette */
-            background-color: var(--bg-frame) !important;
+            /* removed bg-frame override */
             background-color: var(--bg-icon-box) !important;
             color: var(--text-primary) !important;
             transition: background-color 0.25s ease !important;
@@ -428,6 +481,47 @@
             background-color: var(--bg-card) !important;
             color: var(--text-primary) !important;
             border-color: var(--border-card) !important;
+        }
+        /* Light‑mode core overrides */
+/* Generic slate utility overrides for light mode */
+.light-mode [class*="bg-slate-"] { background-color: var(--bg-body) !important; }
+.light-mode [class*="text-slate-"] { color: var(--text-primary) !important; }
+.light-mode [class*="border-slate-"] { border-color: var(--border-card) !important; }
+        /* Adjust text colors for light mode */
+.light-mode .text-white { color: var(--text-primary) !important; }
+
+/* SweetAlert light‑mode styling */
+.light-mode .swal2-popup {
+    background-color: var(--bg-card) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-card) !important;
+}
+.light-mode .swal2-title, .light-mode .swal2-content {
+    color: var(--text-primary) !important;
+}
+.light-mode .swal2-confirm {
+    background-color: var(--brand) !important;
+    color: #fff !important;
+}
+.light-mode .swal2-cancel {
+    background-color: var(--bg-input) !important;
+    color: var(--text-primary) !important;
+}
+
+            background-color: var(--bg-frame) !important;
+            color: var(--text-primary) !important;
+        }
+        .light-mode .mobile-frame * {
+            background-color: var(--bg-card) !important;
+            color: var(--text-primary) !important;
+            border-color: var(--border-card) !important;
+        }
+        .light-mode .mobile-frame input,
+        .light-mode .mobile-frame select,
+        .light-mode .mobile-frame textarea {
+            background-color: var(--bg-input) !important;
+            color: var(--text-input) !important;
+            border-color: var(--border-color) !important;
         }
         .light-mode input, 
         .light-mode select, 
