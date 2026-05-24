@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id" class="h-full">
+<html lang="id" class="h-full light-mode">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -50,6 +50,10 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Immediately check and apply the saved theme before HTML parses to prevent theme flashes -->
     <script>
+        // Ensure a theme is set; default to light mode
+        if (!localStorage.getItem('theme')) {
+            localStorage.setItem('theme', 'light');
+        }
         if (localStorage.getItem('theme') === 'light') {
             document.documentElement.classList.add('light-mode');
         }
@@ -393,6 +397,8 @@
         .light-mode .bg-slate-800, 
         .light-mode .bg-slate-900,
         .light-mode .bg-slate-800\/60 {
+            /* Override dark slate backgrounds with light mode palette */
+            background-color: var(--bg-frame) !important;
             background-color: var(--bg-icon-box) !important;
             color: var(--text-primary) !important;
             transition: background-color 0.25s ease !important;
@@ -404,6 +410,25 @@
         }
 
         /* Inputs & select forms overrides */
+        /* Light mode overrides for default dark utility classes */
+        .light-mode .bg-slate-900,
+        .light-mode .bg-slate-800,
+        .light-mode .bg-slate-900\/70,
+        .light-mode .bg-slate-900\/60,
+        .light-mode .bg-slate-900\/20,
+        .light-mode .bg-slate-800\/60,
+        .light-mode .text-slate-100,
+        .light-mode .text-slate-200,
+        .light-mode .text-slate-300,
+        .light-mode .text-slate-400,
+        .light-mode .text-slate-500,
+        .light-mode .text-slate-600,
+        .light-mode .border-slate-800,
+        .light-mode .border-slate-900 {
+            background-color: var(--bg-card) !important;
+            color: var(--text-primary) !important;
+            border-color: var(--border-card) !important;
+        }
         .light-mode input, 
         .light-mode select, 
         .light-mode textarea {
@@ -443,6 +468,16 @@
         }
 
         /* High-Contrast Interactive Scoring Grid in Light Mode */
+        /* Generic Slate Utility Overrides for Light Mode */
+        .light-mode [class*="bg-slate-"] {
+            background-color: var(--bg-card) !important;
+        }
+        .light-mode [class*="text-slate-"] {
+            color: var(--text-primary) !important;
+        }
+        .light-mode [class*="border-slate-"] {
+            border-color: var(--border-card) !important;
+        }
         .light-mode thead {
             background-color: #f1f5f9 !important; /* Clean light gray */
             border-bottom: 2px solid rgba(15, 23, 42, 0.08) !important;
