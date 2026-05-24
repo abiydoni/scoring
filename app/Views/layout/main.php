@@ -6,6 +6,16 @@
     <title><?= $title ?? 'Scoring App' ?></title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="manifest" href="/manifest.json">
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.register('/sw.js').catch(function (err) {
+                    console.error('ServiceWorker registration failed:', err);
+                });
+            });
+        }
+    </script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -109,6 +119,10 @@
         }
 
         /* Mobile viewport frame simulation for desktop */
+        .modal-open { /* placeholder – JS handles padding */ }
+        .modal-open .mobile-frame { overflow: hidden !important; }
+        
+        
         .mobile-frame {
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
             border-left: 1px solid var(--border-color) !important;
@@ -545,7 +559,7 @@
         </div>
 
         <!-- Main Viewport Content Area -->
-        <div class="flex-1 overflow-y-auto no-scrollbar pb-24 px-4 py-4 relative bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950">
+        <div class="flex-1 overflow-y-scroll no-scrollbar pb-24 px-4 py-4 relative bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950">
             <!-- Alert Messages (Dynamic CI4 Flashdata) -->
             <?php if (session()->getFlashdata('success')): ?>
                 <div class="mb-4 p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-xl text-xs flex items-center gap-2">

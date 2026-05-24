@@ -127,7 +127,6 @@
         const modal = document.getElementById('athlete-form-modal');
         const title = document.getElementById('form-modal-title');
         const form = document.getElementById('athlete-form');
-        const scrollContainer = document.querySelector('.flex-1');
         
         // Reset form
         form.reset();
@@ -143,13 +142,19 @@
             document.getElementById('email').value = data.email || '';
             document.getElementById('asal_klub').value = data.asal_klub || '';
         }
+        // Simply add class to keep modal open without shifting layout
+        document.body.classList.add('modal-open');
         modal.classList.remove('hidden');
         document.getElementById('nama').focus({preventScroll:true});
     }
 
-function closeAthleteModal() {
+    function closeAthleteModal() {
         const modal = document.getElementById('athlete-form-modal');
         modal.classList.add('hidden');
+        // Reset overflow and padding
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+        document.body.classList.remove('modal-open');
     }
 
     function editAthlete(data) {
