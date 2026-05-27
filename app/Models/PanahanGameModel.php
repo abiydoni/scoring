@@ -24,6 +24,8 @@ class PanahanGameModel extends Model
         'set_point_atlet', 
         'set_point_lawan', 
         'divisi',
+        'partner_id',
+        'partner_nama',
         'keterangan'
     ];
 

@@ -48,13 +48,34 @@
                         </div>
                     </div>
                 </div>
-                <div class="div">
-                    <label for="asal_klub" class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Asal Klub / Kota <span class="text-rose-500">*</span></label>
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
-                            <i class='bx bx-building-house text-base'></i>
-                        </div>
-                        <input type="text" id="asal_klub" name="asal_klub" placeholder="Masukkan asal klub atau kota" class="w-full pl-10 pr-4 py-2.5 bg-slate-900 border border-slate-800 rounded-2xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-slate-100 placeholder-slate-600 text-xs transition-all outline-none" />
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="jenis_kelamin" class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Jenis Kelamin <span class="text-rose-500">*</span></label>
+                        <select id="jenis_kelamin" name="jenis_kelamin" required class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-2xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-slate-100 text-xs transition-all outline-none appearance-none">
+                            <option value="">Pilih Gender</option>
+                            <option value="L">Laki-laki (M)</option>
+                            <option value="P">Perempuan (W)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="divisi" class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Divisi <span class="text-rose-500">*</span></label>
+                        <select id="divisi" name="divisi" required class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-2xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-slate-100 text-xs transition-all outline-none appearance-none">
+                            <option value="">Pilih Divisi</option>
+                            <option value="recurve">Recurve</option>
+                            <option value="compound">Compound</option>
+                            <option value="standard">Standard Bow / Nasional</option>
+                            <option value="barebow">Barebow</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="klub" class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Klub Panahan</label>
+                        <input type="text" id="klub" name="klub" placeholder="Contoh: X-Ten Archery" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-2xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-slate-100 placeholder-slate-600 text-xs transition-all outline-none" />
+                    </div>
+                    <div>
+                        <label for="kota" class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Kota Asal</label>
+                        <input type="text" id="kota" name="kota" placeholder="Contoh: Jakarta" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-2xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-slate-100 placeholder-slate-600 text-xs transition-all outline-none" />
                     </div>
                 </div>
                 <div class="flex items-center gap-3 pt-2">
@@ -97,10 +118,22 @@
                                 <?php if ($person['email']): ?>
                                     <span class="flex items-center gap-1"><i class='bx bx-envelope text-xs text-brand-400/85'></i><?= esc($person['email']) ?></span>
                                 <?php endif; ?>
-                                <?php if (!empty($person['asal_klub'])): ?>
+                                <?php if (!empty($person['divisi'])): ?>
+                                    <span class="flex items-center gap-1">
+                                        <i class='bx bx-target-lock text-xs text-brand-400/85'></i>
+                                        <span class="capitalize"><?= esc($person['divisi']) ?></span>
+                                    </span>
+                                <?php endif; ?>
+                                <?php if (!empty($person['klub'])): ?>
                                     <span class="flex items-center gap-1">
                                         <i class='bx bx-building-house text-xs text-brand-400/85'></i>
-                                        <?= esc($person['asal_klub']) ?>
+                                        <?= esc($person['klub']) ?>
+                                    </span>
+                                <?php endif; ?>
+                                <?php if (!empty($person['kota'])): ?>
+                                    <span class="flex items-center gap-1">
+                                        <i class='bx bx-map text-xs text-brand-400/85'></i>
+                                        <?= esc($person['kota']) ?>
                                     </span>
                                 <?php endif; ?>
                             </div>
@@ -140,7 +173,10 @@
             document.getElementById('nama').value = data.nama;
             document.getElementById('telepon').value = data.telepon || '';
             document.getElementById('email').value = data.email || '';
-            document.getElementById('asal_klub').value = data.asal_klub || '';
+            document.getElementById('jenis_kelamin').value = data.jenis_kelamin || '';
+            document.getElementById('divisi').value = data.divisi || '';
+            document.getElementById('klub').value = data.klub || '';
+            document.getElementById('kota').value = data.kota || '';
         }
         // Simply add class to keep modal open without shifting layout
         document.body.classList.add('modal-open');

@@ -12,7 +12,7 @@ class AnggotaModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['nama', 'telepon', 'email', 'asal_klub'];
+    protected $allowedFields    = ['nama', 'telepon', 'email', 'jenis_kelamin', 'divisi', 'klub', 'kota'];
 
     // Dates
     protected $useTimestamps = true;

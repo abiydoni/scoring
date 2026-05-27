@@ -64,7 +64,7 @@ class Panahan extends BaseController
         $rules = [
             'anggota_id'  => 'required|is_natural_no_zero',
             'tanggal'     => 'required|valid_date[Y-m-d]',
-            'tipe_game'   => 'required|in_list[kualifikasi,aduan]',
+            'tipe_game'   => 'required|in_list[kualifikasi,aduan,mixteam]',
         ];
 
         if (!$this->validate($rules)) {
@@ -76,11 +76,14 @@ class Panahan extends BaseController
 
         $tipeGame = $this->request->getPost('tipe_game');
         
-        // If Aduan (Duel), session is always 1 (represented as sets 1-5 inside 1 session), and we parse opponents
-        $jumlahSesi = ($tipeGame === 'aduan') ? 1 : intval($this->request->getPost('jumlah_sesi') ?? 2);
+        // If Aduan, session is always 1 (represented as sets 1-5 inside 1 session)
+        // If Mix Team, session is always 1 (represented as sets 1-4 inside 1 session)
+        $jumlahSesi = ($tipeGame === 'aduan' || $tipeGame === 'mixteam') ? 1 : intval($this->request->getPost('jumlah_sesi') ?? 2);
         
         $lawanId = null;
         $lawanNama = null;
+        $partnerId = null;
+        $partnerNama = null;
 
         if ($tipeGame === 'aduan') {
             $lawanIdInput = $this->request->getPost('lawan_id');
@@ -89,6 +92,14 @@ class Panahan extends BaseController
             } else {
                 $lawanNama = $this->request->getPost('lawan_nama') ?: 'Lawan';
             }
+        } elseif ($tipeGame === 'mixteam') {
+            $partnerIdInput = $this->request->getPost('partner_id');
+            if ($partnerIdInput && is_numeric($partnerIdInput)) {
+                $partnerId = intval($partnerIdInput);
+                $partner = $this->anggotaModel->find($partnerId);
+                $partnerNama = $partner ? $partner['nama'] : 'Partner';
+            }
+            $lawanNama = $this->request->getPost('lawan_nama') ?: 'Tim Lawan';
         }
 
         $divisi = $this->request->getPost('divisi') ?: 'recurve';
@@ -105,6 +116,8 @@ class Panahan extends BaseController
             'set_point_atlet'   => 0,
             'set_point_lawan'   => 0,
             'divisi'            => $divisi,
+            'partner_id'        => $partnerId,
+            'partner_nama'      => $partnerNama,
             'keterangan'        => $this->request->getPost('keterangan'),
         ]);
 
@@ -272,9 +285,9 @@ class Panahan extends BaseController
             ]);
         }
 
-        // 2. Simpan skor Lawan (is_lawan = 1) - Khusus untuk Aduan
+        // 2. Simpan skor Lawan (is_lawan = 1) - Khusus untuk Aduan / Mixteam
         $opponentShootTotal = 0;
-        if ($game['tipe_game'] === 'aduan' && $opponentArrows) {
+        if (($game['tipe_game'] === 'aduan' || $game['tipe_game'] === 'mixteam') && $opponentArrows) {
             foreach ($opponentArrows as $arrow) {
                 $score = isset($arrow->score) ? intval($arrow->score) : 0;
                 $displayValue = isset($arrow->display_value) ? $arrow->display_value : '0';
@@ -330,7 +343,7 @@ class Panahan extends BaseController
         }
 
         // 3. Rekalkulasi Game Total Score & Set Points
-        if ($game['tipe_game'] === 'aduan') {
+        if ($game['tipe_game'] === 'aduan' || $game['tipe_game'] === 'mixteam') {
             // Hitung akumulatif skor tembakan
             $athleteTotalScoreRow = $this->shootModel->select('SUM(total_score) as grand_total')
                                                      ->where('game_id', $gameId)
@@ -348,8 +361,9 @@ class Panahan extends BaseController
             $setPointAtlet = 0;
             $setPointLawan = 0;
 
-            if ($game['divisi'] !== 'compound') {
-                for ($s = 1; $s <= 5; $s++) {
+            if ($game['divisi'] !== 'compound' && $game['divisi'] !== 'barebow') {
+                $targetSets = ($game['tipe_game'] === 'mixteam') ? 4 : 5;
+                for ($s = 1; $s <= $targetSets; $s++) {
                     $atletSet = $this->shootModel->where('game_id', $gameId)
                                                  ->where('session_number', $sessionNumber)
                                                  ->where('shoot_number', $s)
@@ -363,11 +377,11 @@ class Panahan extends BaseController
                                                  ->first();
 
                     if ($atletSet && $lawanSet) {
-                        // Periksa apakah set ini sudah dimainkan (ada panah yang bukan '0' / kosong)
+                        // Periksa apakah set ini sudah dimainkan (ada panah yang diisi)
                         $isSetShot = $this->shotModel->where('game_id', $gameId)
                                                      ->where('session_number', $sessionNumber)
                                                      ->where('shoot_number', $s)
-                                                     ->where('display_value !=', '0')
+                                                     ->where('display_value !=', '-')
                                                      ->countAllResults() > 0;
 
                         if ($isSetShot) {

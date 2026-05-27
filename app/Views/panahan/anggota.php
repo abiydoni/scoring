@@ -11,8 +11,14 @@
         <div>
             <h3 class="text-sm font-bold text-white"><?= esc($anggota['nama']) ?></h3>
             <span class="text-[9px] text-slate-500 font-semibold uppercase block tracking-wider mt-0.5">Daftar Game Panahan</span>
-<?php if (!empty($anggota['asal_klub'])): ?>
-    <span class="text-[9px] text-slate-400 font-medium"><?= esc($anggota['asal_klub']) ?></span>
+<?php if (!empty($anggota['divisi'])): ?>
+    <span class="text-[9px] px-1.5 py-0.5 bg-brand-500/10 text-brand-400 border border-brand-500/20 rounded font-black tracking-wide uppercase inline-block mt-1"><?= esc($anggota['divisi']) ?></span>
+<?php endif; ?>
+<?php if (!empty($anggota['klub'])): ?>
+    <span class="text-[9px] text-slate-400 font-medium ml-1 flex items-center inline-flex gap-1 mt-1"><i class='bx bx-building-house'></i> <?= esc($anggota['klub']) ?></span>
+<?php endif; ?>
+<?php if (!empty($anggota['kota'])): ?>
+    <span class="text-[9px] text-slate-400 font-medium ml-1 flex items-center inline-flex gap-1 mt-1"><i class='bx bx-map'></i> <?= esc($anggota['kota']) ?></span>
 <?php endif; ?>
         </div>
     </div>
@@ -45,15 +51,16 @@
             <!-- 2. Tipe Game -->
             <div>
                 <label for="tipe_game" class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Tipe Permainan <span class="text-rose-500">*</span></label>
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
-                        <i class='bx bx-trophy text-base'></i>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                            <i class='bx bx-target-lock text-base'></i>
+                        </div>
+                        <select id="tipe_game" name="tipe_game" onchange="toggleGameType(this.value)" class="w-full pl-10 pr-4 py-2.5 bg-slate-900 border border-slate-800 rounded-2xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-slate-100 text-xs transition-all outline-none appearance-none">
+                            <option value="kualifikasi">Kualifikasi (Scoring)</option>
+                            <option value="aduan">Aduan (Match Play)</option>
+                            <option value="mixteam">Mix Team (Beregu Campuran)</option>
+                        </select>
                     </div>
-                    <select id="tipe_game" name="tipe_game" onchange="toggleGameType(this.value)" required class="w-full pl-10 pr-4 py-2.5 bg-slate-900 border border-slate-800 rounded-2xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-slate-100 text-xs transition-all outline-none appearance-none">
-                        <option value="kualifikasi" selected>Kualifikasi (Individu)</option>
-                        <option value="aduan">Aduan (Duel Match Play)</option>
-                    </select>
-                </div>
             </div>
 
             <!-- Divisi / Kategori (Only for Aduan) -->
@@ -108,16 +115,13 @@
                         </div>
                         <select id="lawan_id" name="lawan_id" class="w-full pl-10 pr-4 py-2.5 bg-slate-900 border border-slate-800 rounded-2xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-slate-100 text-xs transition-all outline-none appearance-none">
                             <option value="">-- Pilih Lawan --</option>
-                            <?php foreach ($opponents as $opp): ?>
-                                <option value="<?= $opp['id'] ?>"><?= esc($opp['nama']) ?></option>
-                            <?php endforeach; ?>
                         </select>
                     </div>
                 </div>
 
                 <!-- Opponent Name (Manual Text Field) -->
                 <div id="opponent-manual-input" class="hidden">
-                    <label for="lawan_nama" class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Nama Lawan <span class="text-rose-500">*</span></label>
+                    <label for="lawan_nama" class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5" id="label_lawan_nama">Nama Lawan <span class="text-rose-500">*</span></label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
                             <i class='bx bx-user text-base'></i>
@@ -125,6 +129,20 @@
                         <input type="text" id="lawan_nama" name="lawan_nama" placeholder="Masukkan nama lawan" class="w-full pl-10 pr-4 py-2.5 bg-slate-900 border border-slate-800 rounded-2xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-slate-100 placeholder-slate-600 text-xs transition-all outline-none">
                     </div>
                 </div>
+            </div>
+
+            <!-- Partner Settings (Only for Mix Team) -->
+            <div id="partner-group" class="hidden space-y-3.5">
+                <label for="partner_id" class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Pilih Pasangan (Partner) <span class="text-rose-500">*</span></label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                        <i class='bx bx-group text-base'></i>
+                    </div>
+                    <select id="partner_id" name="partner_id" class="w-full pl-10 pr-4 py-2.5 bg-slate-900 border border-slate-800 rounded-2xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-slate-100 text-xs transition-all outline-none appearance-none">
+                        <option value="">-- Pilih Partner --</option>
+                    </select>
+                </div>
+                <p class="text-[9px] text-slate-500 font-medium">Hanya menampilkan atlet dengan jenis kelamin berbeda di divisi yang sama.</p>
             </div>
 
             <!-- 5. Keterangan / Notes -->
@@ -172,6 +190,10 @@
                                 <span class="text-[9px] px-1.5 py-0.5 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded font-black tracking-wide uppercase">Aduan (<?= esc(ucfirst($game['divisi'] ?? 'recurve')) ?>)</span>
                                 <span class="text-[9px] text-slate-500 font-bold">•</span>
                                 <span class="text-[9px] text-slate-400 font-bold">vs <?= esc($game['lawan_id'] ? $game['nama_lawan_db'] : ($game['lawan_nama'] ?: 'Lawan')) ?></span>
+                            <?php elseif ($game['tipe_game'] === 'mixteam'): ?>
+                                <span class="text-[9px] px-1.5 py-0.5 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded font-black tracking-wide uppercase">Mix Team</span>
+                                <span class="text-[9px] text-slate-500 font-bold">•</span>
+                                <span class="text-[9px] text-slate-400 font-bold">vs <?= esc($game['lawan_nama'] ?: 'Tim Lawan') ?></span>
                             <?php else: ?>
                                 <span class="text-[9px] px-1.5 py-0.5 bg-brand-500/10 text-brand-400 border border-brand-500/20 rounded font-black tracking-wide uppercase">Kualifikasi</span>
                                 <span class="text-[9px] text-slate-500 font-bold">•</span>
@@ -183,7 +205,7 @@
                 
                 <div class="flex items-center gap-3">
                     <div class="text-right select-none">
-                        <?php if ($game['tipe_game'] === 'aduan'): ?>
+                        <?php if ($game['tipe_game'] === 'aduan' || $game['tipe_game'] === 'mixteam'): ?>
                             <?php if (($game['divisi'] ?? 'recurve') === 'compound'): ?>
                                 <span class="text-[8px] font-bold text-slate-500 uppercase tracking-wide">Skor Akhir</span>
                                 <span class="text-sm font-extrabold text-amber-400 block mt-0.5"><?= $game['total_score'] ?> - <?= $game['total_score_lawan'] ?></span>
@@ -218,20 +240,84 @@
         document.getElementById('new-game-panel').classList.add('hidden');
     }
 
+    var allOpponents = <?= json_encode($opponents) ?>;
+    var currentAthlete = <?= json_encode($anggota) ?>;
+
     function toggleGameType(val) {
         const sesiGroup = document.getElementById('jumlah-sesi-group');
         const opponentGroup = document.getElementById('opponent-group');
         const divisiGroup = document.getElementById('divisi-group');
+        const partnerGroup = document.getElementById('partner-group');
+        const labelLawanNama = document.getElementById('label_lawan_nama');
         
         if (val === 'aduan') {
             sesiGroup.classList.add('hidden');
             opponentGroup.classList.remove('hidden');
             divisiGroup.classList.remove('hidden');
+            partnerGroup.classList.add('hidden');
+            labelLawanNama.innerHTML = 'Nama Lawan <span class="text-rose-500">*</span>';
+            populateOpponents('aduan');
+        } else if (val === 'mixteam') {
+            sesiGroup.classList.add('hidden');
+            opponentGroup.classList.remove('hidden');
+            divisiGroup.classList.add('hidden'); // Divisi follows current athlete
+            
+            // Set the divisi value manually so it submits the correct division
+            if (currentAthlete && currentAthlete.divisi) {
+                document.getElementById('divisi').value = currentAthlete.divisi;
+            }
+
+            partnerGroup.classList.remove('hidden');
+            labelLawanNama.innerHTML = 'Nama Tim Lawan <span class="text-rose-500">*</span>';
+            
+            // Force manual mode for mixteam opponent, hide database option temporarily
+            document.querySelector('input[name="lawan_select_type"][value="manual"]').checked = true;
+            document.querySelector('input[name="lawan_select_type"][value="database"]').parentElement.classList.add('hidden');
+            toggleLawanInputMode('manual');
+            
+            populatePartners();
         } else {
             sesiGroup.classList.remove('hidden');
             opponentGroup.classList.add('hidden');
             divisiGroup.classList.add('hidden');
+            partnerGroup.classList.add('hidden');
+            // Reset radio to visible
+            document.querySelector('input[name="lawan_select_type"][value="database"]').parentElement.classList.remove('hidden');
         }
+    }
+
+    function populateOpponents(mode) {
+        const select = document.getElementById('lawan_id');
+        select.innerHTML = '<option value="">-- Pilih Lawan --</option>';
+        
+        let filtered = allOpponents;
+        if (mode === 'aduan') {
+            // Same division, same gender
+            filtered = allOpponents.filter(o => 
+                o.divisi === currentAthlete.divisi && 
+                o.jenis_kelamin === currentAthlete.jenis_kelamin
+            );
+        }
+
+        filtered.forEach(opp => {
+            select.innerHTML += `<option value="${opp.id}">${opp.nama} (${opp.klub || 'Tanpa Klub'})</option>`;
+        });
+    }
+
+    function populatePartners() {
+        const select = document.getElementById('partner_id');
+        select.innerHTML = '<option value="">-- Pilih Partner --</option>';
+        
+        // Same division, DIFFERENT gender
+        let filtered = allOpponents.filter(o => 
+            o.divisi === currentAthlete.divisi && 
+            o.jenis_kelamin !== currentAthlete.jenis_kelamin &&
+            o.jenis_kelamin != null && o.jenis_kelamin !== ''
+        );
+
+        filtered.forEach(opp => {
+            select.innerHTML += `<option value="${opp.id}">${opp.nama} (${opp.klub || 'Tanpa Klub'})</option>`;
+        });
     }
 
     function toggleLawanInputMode(val) {
@@ -255,6 +341,7 @@
         const tipeGame = document.getElementById('tipe_game').value;
         const lawanId = document.getElementById('lawan_id').value;
         const lawanNama = document.getElementById('lawan_nama').value;
+        const partnerId = document.getElementById('partner_id') ? document.getElementById('partner_id').value : '';
 
         // Validation for Opponent
         if (tipeGame === 'aduan') {
@@ -292,6 +379,9 @@
         formData.append('lawan_nama', lawanNama);
         formData.append('divisi', document.getElementById('divisi').value);
         formData.append('keterangan', document.getElementById('keterangan').value);
+        if (tipeGame === 'mixteam') {
+            formData.append('partner_id', partnerId);
+        }
 
         // Show custom transparent sports loader
         showLoading('MENYIAPKAN GAME', 'Membuat formulir scoring di database...');

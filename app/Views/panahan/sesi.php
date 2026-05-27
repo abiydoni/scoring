@@ -48,21 +48,27 @@
 <?php endif; ?>
 
 <!-- Interactive Scoring Grid -->
-<div class="bg-slate-850 border border-slate-800/90 rounded-3xl overflow-hidden shadow-lg shadow-black/25">
+<div class="bg-slate-850 border border-slate-800/90 rounded-3xl overflow-hidden shadow-lg shadow-black/25 pb-4">
     <div class="overflow-x-auto no-scrollbar">
-        <?php if ($game['tipe_game'] === 'aduan'): ?>
-            <!-- Aduan / Match Play Duel Layout -->
+        <?php if ($game['tipe_game'] === 'aduan' || $game['tipe_game'] === 'mixteam'): ?>
+            <?php 
+                $numArrows = ($game['tipe_game'] === 'mixteam') ? 4 : 3; 
+            ?>
+            <!-- Aduan / Mix Team Duel Layout -->
             <table class="w-full select-none table-fixed min-w-[340px]">
                 <thead class="bg-slate-900/60 border-b border-slate-800/80">
                     <tr>
                         <th class="w-8 py-3 text-center text-[9px] font-black text-slate-400 uppercase tracking-widest border-r border-slate-800/30">Set</th>
-                        <th colspan="3" class="py-3 text-center text-[9px] font-black text-brand-400 uppercase tracking-widest"><?= esc(explode(' ', $game['nama_anggota'])[0]) ?></th>
-                        <th class="w-8 py-3 text-center text-[9px] font-black text-slate-500 uppercase tracking-widest">Tot</th>
-                        <th class="w-12 py-3 text-center text-[9px] font-black text-amber-500 uppercase tracking-widest" id="poin-header-title">
-                            <?= $game['divisi'] === 'compound' ? 'Lead' : 'Poin' ?>
+                        <th colspan="<?= $numArrows ?>" class="py-3 text-center text-[9px] font-black text-brand-400 uppercase tracking-widest">
+                            <?= esc(explode(' ', $game['nama_anggota'])[0]) ?>
+                            <?= $game['tipe_game'] === 'mixteam' ? ' & ' . esc(explode(' ', $game['partner_nama'])[0]) : '' ?>
                         </th>
                         <th class="w-8 py-3 text-center text-[9px] font-black text-slate-500 uppercase tracking-widest">Tot</th>
-                        <th colspan="3" class="py-3 text-center text-[9px] font-black text-amber-400 uppercase tracking-widest"><?= esc(explode(' ', $namaLawan)[0]) ?></th>
+                        <th class="w-12 py-3 text-center text-[9px] font-black text-amber-500 uppercase tracking-widest" id="poin-header-title">
+                            <?= ($game['divisi'] === 'compound' || $game['divisi'] === 'barebow') ? 'Lead' : 'Poin' ?>
+                        </th>
+                        <th class="w-8 py-3 text-center text-[9px] font-black text-slate-500 uppercase tracking-widest">Tot</th>
+                        <th colspan="<?= $numArrows ?>" class="py-3 text-center pr-4 text-[9px] font-black text-amber-400 uppercase tracking-widest"><?= esc(explode(' ', $namaLawan)[0]) ?></th>
                     </tr>
                 </thead>
                 <tbody id="shootsTableBody" class="divide-y divide-slate-800/40">
@@ -70,11 +76,11 @@
                 </tbody>
                 <tfoot class="bg-slate-900/70 border-t border-slate-800">
                     <tr>
-                        <td colspan="4" class="px-3 py-3.5 text-left text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Skor Akumulatif</td>
-                        <td class="py-3.5 text-center text-xs font-black text-brand-400" id="totalScoreAtlet">0</td>
-                        <td class="py-3.5 text-center text-[9px] font-black text-slate-500 uppercase tracking-widest border-x border-slate-800">Skor Akhir</td>
-                        <td class="py-3.5 text-center text-xs font-black text-amber-400" id="totalScoreLawan">0</td>
-                        <td colspan="3" class="py-3.5"></td>
+                        <td colspan="<?= $numArrows + 1 ?>" class="px-3 pt-3.5 pb-6 text-left text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Skor Akumulatif</td>
+                        <td class="pt-3.5 pb-6 text-center text-xs font-black text-brand-400" id="totalScoreAtlet">0</td>
+                        <td class="pt-3.5 pb-6 text-center text-[9px] font-black text-slate-500 uppercase tracking-widest border-x border-slate-800">Skor Akhir</td>
+                        <td class="pt-3.5 pb-6 text-center text-xs font-black text-amber-400" id="totalScoreLawan">0</td>
+                        <td colspan="<?= $numArrows ?>" class="pt-3.5 pb-6"></td>
                     </tr>
                 </tfoot>
             </table>
@@ -86,7 +92,7 @@
                     <tr>
                         <th class="w-12 py-3 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Rbh</th>
                         <th colspan="6" class="py-3 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Nilai Anak Panah</th>
-                        <th class="w-14 py-3 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Tot</th>
+                        <th class="w-14 py-3 text-center pr-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Tot</th>
                     </tr>
                 </thead>
                 <tbody id="shootsTableBody" class="divide-y divide-slate-800/40">
@@ -94,8 +100,8 @@
                 </tbody>
                 <tfoot class="bg-slate-900/70 border-t border-slate-800">
                     <tr>
-                        <td colspan="7" class="px-5 py-4 text-left text-xs font-extrabold text-slate-400 uppercase tracking-widest">Grand Total Sesi</td>
-                        <td class="py-4 text-center text-base font-black text-emerald-400" id="grandTotal">0</td>
+                        <td colspan="7" class="px-5 pt-4 pb-6 text-left text-xs font-extrabold text-slate-400 uppercase tracking-widest">Grand Total Sesi</td>
+                        <td class="pt-4 pb-6 pr-4 text-center text-base font-black text-emerald-400" id="grandTotal">0</td>
                     </tr>
                 </tfoot>
             </table>
@@ -137,13 +143,13 @@
             <button onclick="selectScoreFromPicker('5', 5)" class="aspect-square bg-gradient-to-br from-sky-500 to-sky-600 active:scale-95 text-white font-black text-2xl rounded-2xl border border-sky-500/40 transition-all flex items-center justify-center">5</button>
 
             <!-- BLACK (4/3s) -->
-            <button onclick="selectScoreFromPicker('4', 4)" class="aspect-square bg-slate-950 active:scale-95 text-white font-black text-2xl rounded-2xl border border-slate-800 transition-all flex items-center justify-center">4</button>
-            <button onclick="selectScoreFromPicker('3', 3)" class="aspect-square bg-slate-950 active:scale-95 text-white font-black text-2xl rounded-2xl border border-slate-800 transition-all flex items-center justify-center">3</button>
+            <button onclick="selectScoreFromPicker('4', 4)" style="color: #ffffff !important;" class="aspect-square bg-black active:scale-95 !text-white font-black text-2xl rounded-2xl border border-slate-800 transition-all flex items-center justify-center shadow">4</button>
+            <button onclick="selectScoreFromPicker('3', 3)" style="color: #ffffff !important;" class="aspect-square bg-black active:scale-95 !text-white font-black text-2xl rounded-2xl border border-slate-800 transition-all flex items-center justify-center shadow">3</button>
 
-            <!-- WHITE / GRAY (2/1/0s) -->
-            <button onclick="selectScoreFromPicker('2', 2)" class="aspect-square bg-gradient-to-br from-slate-700 to-slate-800 active:scale-95 text-slate-100 font-black text-2xl rounded-2xl border border-slate-600 transition-all flex items-center justify-center">2</button>
-            <button onclick="selectScoreFromPicker('1', 1)" class="aspect-square bg-gradient-to-br from-slate-700 to-slate-800 active:scale-95 text-slate-100 font-black text-2xl rounded-2xl border border-slate-600 transition-all flex items-center justify-center">1</button>
-            <button onclick="selectScoreFromPicker('M', 0)" class="aspect-square bg-gradient-to-br from-slate-700 to-slate-800 active:scale-95 text-rose-500 font-black text-2xl rounded-2xl border border-slate-600 transition-all flex items-center justify-center">M</button>
+            <!-- WHITE (2/1/0s) -->
+            <button onclick="selectScoreFromPicker('2', 2)" class="aspect-square bg-white active:scale-95 text-slate-900 font-black text-2xl rounded-2xl border border-slate-300 transition-all flex items-center justify-center shadow">2</button>
+            <button onclick="selectScoreFromPicker('1', 1)" class="aspect-square bg-white active:scale-95 text-slate-900 font-black text-2xl rounded-2xl border border-slate-300 transition-all flex items-center justify-center shadow">1</button>
+            <button onclick="selectScoreFromPicker('M', 0)" class="aspect-square bg-white active:scale-95 text-slate-900 font-black text-2xl rounded-2xl border border-slate-300 transition-all flex items-center justify-center shadow">M</button>
         </div>
     </div>
 </div>
@@ -160,18 +166,22 @@
     };
 
     function getScoreClass(score, display) {
-        if (display === 'X' || score === 10) {
+        let s = parseInt(score);
+        
+        if (display === '-') {
+            return 'bg-slate-900/60 text-slate-600 border-slate-800/80';
+        }
+
+        if (display === 'X' || s === 10 || s === 9) {
             return 'bg-amber-400 text-slate-900 border-amber-500 shadow shadow-amber-500/5';
-        } else if (score === 9 || score === 8) {
-            return 'bg-rose-500 text-white border-rose-600 shadow shadow-rose-600/5';
-        } else if (score === 7 || score === 6) {
-            return 'bg-sky-500 text-white border-sky-600 shadow shadow-sky-600/5';
-        } else if (score === 5 || score === 4) {
-            return 'bg-slate-950 text-white border-slate-800';
-        } else if (score > 0) {
-            return 'bg-slate-800 text-slate-200 border-slate-700';
-        } else if (display === 'M' || display === '0') {
-            return 'bg-slate-800/40 text-rose-500 border-slate-800';
+        } else if (s === 8 || s === 7) {
+            return 'bg-rose-500 !text-white border-rose-600 shadow shadow-rose-600/5';
+        } else if (s === 6 || s === 5) {
+            return 'bg-sky-500 !text-white border-sky-600 shadow shadow-sky-600/5';
+        } else if (s === 4 || s === 3) {
+            return 'bg-black !text-white border-slate-800 shadow shadow-black/10';
+        } else if (s <= 2 || display === 'M' || display === '0') {
+            return 'bg-white text-slate-900 border-slate-200 shadow shadow-white/5';
         }
         return 'bg-slate-900/60 text-slate-600 border-slate-800/80';
     }
@@ -186,16 +196,19 @@
         const tbody = document.getElementById("shootsTableBody");
         let html = '';
 
-        if (game.tipe_game === 'aduan') {
-            // Render 5 Sets for Aduan
-            for (let setNum = 1; setNum <= 5; setNum++) {
+        if (game.tipe_game === 'aduan' || game.tipe_game === 'mixteam') {
+            const numSets = (game.tipe_game === 'mixteam') ? 4 : 5;
+            const numArrows = (game.tipe_game === 'mixteam') ? 4 : 3;
+
+            // Render Sets for Aduan/Mixteam
+            for (let setNum = 1; setNum <= numSets; setNum++) {
                 const atletShots = (shootData[setNum] && shootData[setNum][0]) ? shootData[setNum][0] : [];
                 const lawanShots = (shootData[setNum] && shootData[setNum][1]) ? shootData[setNum][1] : [];
 
                 const atletData = [];
                 const lawanData = [];
 
-                for (let arrow = 1; arrow <= 3; arrow++) {
+                for (let arrow = 1; arrow <= numArrows; arrow++) {
                     const aInfo = atletShots.find(s => s.arrow_number === arrow);
                     const lInfo = lawanShots.find(s => s.arrow_number === arrow);
 
@@ -211,11 +224,11 @@
                         <!-- Set Number -->
                         <td class="py-3 text-center text-xs font-bold text-slate-500 border-r border-slate-800/40">${setNum}</td>
                         
-                        <!-- Atlet Buttons (3 Arrows) -->
+                        <!-- Atlet Buttons -->
                         ${atletData.map((arrow, idx) => {
                             const arrowNum = idx + 1;
                             return `
-                                <td class="py-2.5 text-center">
+                                <td class="py-2.5 text-center px-0.5">
                                     <button type="button" 
                                         data-shoot="${setNum}" 
                                         data-arrow="${arrowNum}"
@@ -237,11 +250,12 @@
                         <!-- Lawan Total Set Score -->
                         <td class="py-3 text-center text-xs font-black text-amber-400 border-r border-slate-800/20" id="lawan-total-${setNum}">${lawanTotal}</td>
 
-                        <!-- Lawan Buttons (3 Arrows) -->
+                        <!-- Lawan Buttons -->
                         ${lawanData.map((arrow, idx) => {
                             const arrowNum = idx + 1;
+                            const isLast = idx === lawanData.length - 1;
                             return `
-                                <td class="py-2.5 text-center">
+                                <td class="py-2.5 text-center ${isLast ? 'pl-0.5 pr-4' : 'px-0.5'}">
                                     <button type="button" 
                                         data-shoot="${setNum}" 
                                         data-arrow="${arrowNum}"
@@ -277,8 +291,9 @@
                         <td class="py-3 text-center text-xs font-bold text-slate-500 border-r border-slate-800/40">${shootNum}</td>
                         ${arrowData.map((arrow, idx) => {
                             const arrowNum = idx + 1;
+                            const isLast = idx === arrowData.length - 1;
                             return `
-                                <td class="py-2.5 text-center">
+                                <td class="py-2.5 text-center ${isLast ? 'pl-0.5 pr-4' : 'px-0.5'}">
                                     <button type="button" 
                                         data-shoot="${shootNum}" 
                                         data-arrow="${arrowNum}"
@@ -290,7 +305,7 @@
                                 </td>
                             `;
                         }).join('')}
-                        <td class="py-3 text-center text-sm font-black text-slate-300 border-l border-slate-800/40" id="total-${shootNum}">${total}</td>
+                        <td class="py-3 text-center text-sm font-black text-slate-300 border-l border-slate-800/40 pr-4" id="total-${shootNum}">${total}</td>
                     </tr>
                 `;
             }
@@ -356,10 +371,10 @@
         button.className += ` ${getScoreClass(score, value)}`;
 
         // Recalculate Row Totals
-        if (game.tipe_game === 'aduan') {
+        if (game.tipe_game === 'aduan' || game.tipe_game === 'mixteam') {
             // Recalculate Athlete or Opponent set total
             let setTotal = 0;
-            const targetArrowCount = 3;
+            const targetArrowCount = (game.tipe_game === 'mixteam') ? 4 : 3;
             for (let i = 1; i <= targetArrowCount; i++) {
                 const btn = row.querySelector(`button[data-arrow="${i}"][data-lawan="${currentIsLawan}"]`);
                 setTotal += scoreOptions[btn.textContent.trim()] || 0;
@@ -393,9 +408,12 @@
         let cumulativeSetAtlet = 0;
         let cumulativeSetLawan = 0;
 
-        const isCompound = (game.divisi === 'compound');
+        const isCompound = (game.divisi === 'compound' || game.divisi === 'barebow');
 
-        for (let s = 1; s <= 5; s++) {
+        const numSets = (game.tipe_game === 'mixteam') ? 4 : 5;
+        const numArrows = (game.tipe_game === 'mixteam') ? 4 : 3;
+
+        for (let s = 1; s <= numSets; s++) {
             const atletVal = document.getElementById(`atlet-total-${s}`).textContent.trim();
             const lawanVal = document.getElementById(`lawan-total-${s}`).textContent.trim();
             
@@ -410,7 +428,7 @@
             const row = document.querySelector(`tr[data-shoot="${s}"]`);
             let isSetComplete = true;
             
-            for (let arrow = 1; arrow <= 3; arrow++) {
+            for (let arrow = 1; arrow <= numArrows; arrow++) {
                 const btnA = row.querySelector(`button[data-arrow="${arrow}"][data-lawan="0"]`);
                 const btnL = row.querySelector(`button[data-arrow="${arrow}"][data-lawan="1"]`);
                 if (btnA.textContent.trim() === '-' || btnL.textContent.trim() === '-') {
@@ -486,8 +504,10 @@
     // Unified Save scoring sheet handler
     async function saveAllShoots(shouldRedirect = true) {
         const isAduan = (game.tipe_game === 'aduan');
-        const targetShootCount = isAduan ? 5 : 6;
-        const targetArrowCount = isAduan ? 3 : 6;
+        const isMixteam = (game.tipe_game === 'mixteam');
+        
+        const targetShootCount = isMixteam ? 4 : (isAduan ? 5 : 6);
+        const targetArrowCount = isMixteam ? 4 : (isAduan ? 3 : 6);
         
         const sessionsData = [];
         let hasEmpty = false;
@@ -504,20 +524,20 @@
                 const val = btn.textContent.trim();
                 if (val === '-') {
                     hasEmpty = true;
-                    athleteArrows.push({ arrow_number: a, score: 0, display_value: '0' });
+                    athleteArrows.push({ arrow_number: a, score: 0, display_value: '-' });
                 } else {
                     athleteArrows.push({ arrow_number: a, score: scoreOptions[val], display_value: val });
                 }
             }
 
-            // 2. Collect Opponent Arrows (Only for Aduan)
-            if (isAduan) {
+            // 2. Collect Opponent Arrows (Only for Aduan/Mix Team)
+            if (isAduan || isMixteam) {
                 for (let a = 1; a <= targetArrowCount; a++) {
                     const btn = row.querySelector(`button[data-arrow="${a}"][data-lawan="1"]`);
                     const val = btn.textContent.trim();
                     if (val === '-') {
                         hasEmpty = true;
-                        opponentArrows.push({ arrow_number: a, score: 0, display_value: '0' });
+                        opponentArrows.push({ arrow_number: a, score: 0, display_value: '-' });
                     } else {
                         opponentArrows.push({ arrow_number: a, score: scoreOptions[val], display_value: val });
                     }
@@ -527,7 +547,7 @@
             sessionsData.push({
                 shoot_number: s,
                 athlete_arrows: athleteArrows,
-                opponent_arrows: isAduan ? opponentArrows : null
+                opponent_arrows: (isAduan || isMixteam) ? opponentArrows : null
             });
         }
 

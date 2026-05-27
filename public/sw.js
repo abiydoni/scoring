@@ -1,5 +1,5 @@
 // sw.js – Simple Service Worker for Scoring App PWA
-const CACHE_NAME = 'scoring-pwa-v1';
+const CACHE_NAME = 'scoring-pwa-v2';
 const PRECACHE_URLS = [
   '/',
   '/manifest.json',
@@ -29,22 +29,21 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Network‑first for navigation, cache‑first for others
-  if (event.request.mode === 'navigate') {
-    event.respondWith(
-      fetch(event.request).catch(() => caches.match('/'))
-    );
-    return;
-  }
+  // Use Network-First for ALL requests to ensure we always get the latest PHP/HTML/JS
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      return cachedResponse || fetch(event.request).then((networkResponse) => {
-        // Optionally cache new requests
-        return caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, networkResponse.clone());
-          return networkResponse;
-        });
+    fetch(event.request).then((networkResponse) => {
+      // Update cache with the new response
+      const responseClone = networkResponse.clone();
+      caches.open(CACHE_NAME).then((cache) => {
+        // Do not cache API or POST requests
+        if (event.request.method === 'GET') {
+          cache.put(event.request, responseClone);
+        }
       });
+      return networkResponse;
+    }).catch(() => {
+      // Fallback to cache if offline
+      return caches.match(event.request);
     })
   );
 });

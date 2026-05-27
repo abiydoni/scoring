@@ -37,10 +37,13 @@ class Anggota extends BaseController
         }
 
         $this->anggotaModel->save([
-            'nama'       => $this->request->getPost('nama'),
-            'telepon'    => $this->request->getPost('telepon'),
-            'email'      => $this->request->getPost('email'),
-            'asal_klub'  => $this->request->getPost('asal_klub'),
+            'nama'          => $this->request->getPost('nama'),
+            'telepon'       => $this->request->getPost('telepon'),
+            'email'         => $this->request->getPost('email'),
+            'jenis_kelamin' => $this->request->getPost('jenis_kelamin'),
+            'divisi'        => $this->request->getPost('divisi'),
+            'klub'          => $this->request->getPost('klub'),
+            'kota'          => $this->request->getPost('kota'),
         ]);
 
         return redirect()->to('/anggota')->with('success', 'Atlet berhasil ditambahkan!');
@@ -58,10 +61,13 @@ class Anggota extends BaseController
         }
 
         $this->anggotaModel->update($id, [
-            'nama'       => $this->request->getPost('nama'),
-            'telepon'    => $this->request->getPost('telepon'),
-            'email'      => $this->request->getPost('email'),
-            'asal_klub'  => $this->request->getPost('asal_klub'),
+            'nama'          => $this->request->getPost('nama'),
+            'telepon'       => $this->request->getPost('telepon'),
+            'email'         => $this->request->getPost('email'),
+            'jenis_kelamin' => $this->request->getPost('jenis_kelamin'),
+            'divisi'        => $this->request->getPost('divisi'),
+            'klub'          => $this->request->getPost('klub'),
+            'kota'          => $this->request->getPost('kota'),
         ]);
 
         return redirect()->to('/anggota')->with('success', 'Data atlet berhasil diubah!');
