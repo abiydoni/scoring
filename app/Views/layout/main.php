@@ -641,11 +641,8 @@
                     <span class="w-6 h-[1px] bg-gradient-to-l from-transparent to-brand-500/50"></span>
                 </div>
                 <p class="text-[10px] font-medium text-slate-500">
-                    &copy; <?= date('Y') ?> <a href="https://appsbee.my.id" target="_blank" class="font-bold text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-sky-400 hover:from-brand-300 hover:to-sky-300 transition-all">Appsbee.my.id</a>
+                    &copy; <?= date('Y') ?> <a href="https://appsbee.my.id" target="_blank" class="font-bold text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-sky-400 hover:from-brand-300 hover:to-sky-300 transition-all">appsbee.my.id</a>
                 </p>
-                <a href="https://wa.me/6285225106200" target="_blank" class="mt-1 flex items-center gap-1 text-[9px] font-bold text-slate-400 hover:text-emerald-400 transition-colors group">
-                    <i class='bx bxl-whatsapp text-emerald-500 group-hover:scale-125 transition-transform'></i> 0852-2510-6200
-                </a>
             </div>
         </div>
 
