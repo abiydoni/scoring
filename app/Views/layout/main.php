@@ -112,26 +112,7 @@
     --text-input: #0f172a;
     --bg-icon-box: rgba(226, 232, 240, 0.6);
 }
-            /* Light Mode (Premium Ice Blue & Clean Slate) */
-            --bg-body: #fafafa;
-            --bg-frame: #ffffff;
-            --bg-viewport: linear-gradient(180deg, #ffffff 0%, #f8fafc 55%, #fafafa 100%);
-            --bg-header: rgba(255, 255, 255, 0.96);
-            --bg-nav: rgba(255, 255, 255, 0.98);
-            --border-color: rgba(15, 23, 42, 0.08);
-            --border-header: rgba(15, 23, 42, 0.06);
-            --border-nav: rgba(15, 23, 42, 0.05);
-            --text-primary: #0f172a;
-            --text-secondary: #475569;
-            --text-muted: #94a3b8;
-            --bg-card: rgba(241, 245, 249, 0.85);
-            --bg-card-hover: rgba(226, 232, 240, 0.95);
-            --border-card: rgba(15, 23, 42, 0.05);
-            --border-card-hover: rgba(15, 23, 42, 0.12);
-            --bg-input: #f8fafc;
-            --text-input: #0f172a;
-            --bg-icon-box: rgba(226, 232, 240, 0.6);
-        }
+
 
         html { overflow-y: scroll; scrollbar-gutter: stable; }
         body { font-family: 'Outfit', 'Inter', sans-serif; background-color: var(--bg-body) !important; color: var(--text-primary) !important; overflow-x: hidden; overflow-y: scroll; height: 100%; margin: 0; /* Keep vertical scrollbar and prevent layout shift */ scrollbar-gutter: stable; transition: background-color 0.25s ease !important; }
@@ -173,7 +154,7 @@
         }
 
         /* Content Area Dynamic Styling */
-        .flex-1.overflow-y-auto {
+        .flex-1.overflow-y-auto, .flex-1.overflow-y-scroll {
             background: var(--bg-viewport) !important;
             transition: background 0.25s ease !important;
         }
@@ -378,29 +359,14 @@
         }
 
         /* Dashboard welcome card text stays white because of the dark background gradient */
-        .light-mode .bg-gradient-to-br h2, 
-        .light-mode .bg-gradient-to-br p, 
-        .light-mode .bg-gradient-to-br span {
+        .light-mode .dashboard-welcome-card h2, 
+        .light-mode .dashboard-welcome-card p, 
+        .light-mode .dashboard-welcome-card span {
             color: rgba(255, 255, 255, 0.95) !important;
         }
 
         /* Card and items background overrides */
-        .light-mode .bg-slate-800\/30, 
-        .light-mode .bg-slate-800\/20, 
-        .light-mode .bg-slate-800\/40, 
-        .light-mode .bg-slate-850,
-        .light-mode #new-game-panel {
-            background-color: var(--bg-card) !important;
-            border-color: var(--border-card) !important;
-            transition: background-color 0.25s ease, border-color 0.25s ease !important;
-        }
-        .light-mode .bg-slate-800\/30:hover, 
-        .light-mode .bg-slate-800\/20:hover, 
-        .light-mode .bg-slate-800\/40:hover,
-        .light-mode .hover\:border-slate-700:hover {
-            background-color: var(--bg-card-hover) !important;
-            border-color: var(--border-card-hover) !important;
-        }
+       }
 
         /* Card border overrides globally for clean Light Mode borders */
         .light-mode .border-slate-800,
@@ -424,38 +390,10 @@
 /* Light mode: force any Tailwind slate background utility to use the light page background */
 .light-mode [class*="bg-slate-"] {
     background-color: var(--bg-body) !important;
+    background-image: none !important;
     color: var(--text-primary) !important;
     transition: background-color 0.25s ease !important;
 }
-.light-mode .bg-slate-900,
-.light-mode .bg-slate-800\/60,
-.light-mode .bg-slate-800\/20,
-.light-mode .bg-slate-800\/60 {
-    /* Override dark slate backgrounds with light mode palette */
-    background-color: var(--bg-body) !important;
-    color: var(--text-primary) !important;
-    transition: background-color 0.25s ease !important;
-} 
-        /* Removed redundant slate background overrides – now all .bg-slate-* use the page background via the unified rule above */
-.light-mode .bg-slate-800\/60 {
-    /* Use overall page background for light mode */
-    background-color: var(--bg-body) !important;
-    color: var(--text-primary) !important;
-    transition: background-color 0.25s ease !important;
-}
-.light-mode .bg-slate-800\/60 {
-    /* Use overall page background for light mode */
-    background-color: var(--bg-body) !important;
-    color: var(--text-primary) !important;
-    transition: background-color 0.25s ease !important;
-}
-        .light-mode .bg-slate-800\/60 {
-            /* Override dark slate backgrounds with light mode palette */
-            /* removed bg-frame override */
-            background-color: var(--bg-icon-box) !important;
-            color: var(--text-primary) !important;
-            transition: background-color 0.25s ease !important;
-        }
         .light-mode .bg-slate-800:hover, 
         .light-mode .bg-slate-900:hover,
         .light-mode .bg-slate-800\/60:hover {
@@ -464,27 +402,9 @@
 
         /* Inputs & select forms overrides */
         /* Light mode overrides for default dark utility classes */
-        .light-mode .bg-slate-900,
-        .light-mode .bg-slate-800,
-        .light-mode .bg-slate-900\/70,
-        .light-mode .bg-slate-900\/60,
-        .light-mode .bg-slate-900\/20,
-        .light-mode .bg-slate-800\/60,
-        .light-mode .text-slate-100,
-        .light-mode .text-slate-200,
-        .light-mode .text-slate-300,
-        .light-mode .text-slate-400,
-        .light-mode .text-slate-500,
-        .light-mode .text-slate-600,
-        .light-mode .border-slate-800,
-        .light-mode .border-slate-900 {
-            background-color: var(--bg-card) !important;
-            color: var(--text-primary) !important;
-            border-color: var(--border-card) !important;
-        }
+
         /* Light‑mode core overrides */
-/* Generic slate utility overrides for light mode */
-.light-mode [class*="bg-slate-"] { background-color: var(--bg-body) !important; }
+
 .light-mode [class*="text-slate-"] { color: var(--text-primary) !important; }
 .light-mode [class*="border-slate-"] { border-color: var(--border-card) !important; }
         /* Adjust text colors for light mode */
@@ -496,26 +416,20 @@
     color: var(--text-primary) !important;
     border: 1px solid var(--border-card) !important;
 }
-.light-mode .swal2-title, .light-mode .swal2-content {
+.light-mode .swal2-title, .light-mode .swal2-html-container, .light-mode .swal2-content {
     color: var(--text-primary) !important;
 }
 .light-mode .swal2-confirm {
-    background-color: var(--brand) !important;
     color: #fff !important;
 }
 .light-mode .swal2-cancel {
-    background-color: var(--bg-input) !important;
     color: var(--text-primary) !important;
 }
 
             background-color: var(--bg-frame) !important;
             color: var(--text-primary) !important;
         }
-        .light-mode .mobile-frame * {
-            background-color: var(--bg-card) !important;
-            color: var(--text-primary) !important;
-            border-color: var(--border-card) !important;
-        }
+
         .light-mode .mobile-frame input,
         .light-mode .mobile-frame select,
         .light-mode .mobile-frame textarea {

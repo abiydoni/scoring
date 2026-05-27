@@ -3,7 +3,7 @@
 <?= $this->section('content') ?>
 
 <!-- Welcome Panel -->
-<div class="mb-6 p-5 bg-gradient-to-br from-brand-600 to-indigo-700 rounded-3xl relative overflow-hidden shadow-lg shadow-brand-500/10 border border-brand-500/20 select-none light-panel">
+<div class="mb-6 p-5 bg-gradient-to-br from-brand-600 to-indigo-700 rounded-3xl relative overflow-hidden shadow-lg shadow-brand-500/10 border border-brand-500/20 select-none light-panel dashboard-welcome-card">
     <!-- Abstract Design Background Shapes -->
     <div class="absolute -right-10 -bottom-10 w-36 h-36 bg-white/10 rounded-full blur-2xl"></div>
     <div class="absolute -left-6 -top-6 w-24 h-24 bg-brand-400/20 rounded-full blur-xl"></div>

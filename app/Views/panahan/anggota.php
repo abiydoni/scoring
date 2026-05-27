@@ -184,8 +184,13 @@
                 <div class="flex items-center gap-3">
                     <div class="text-right select-none">
                         <?php if ($game['tipe_game'] === 'aduan'): ?>
-                            <span class="text-[8px] font-bold text-slate-500 uppercase tracking-wide">Poin Set</span>
-                            <span class="text-sm font-extrabold text-amber-400 block mt-0.5"><?= $game['set_point_atlet'] ?> - <?= $game['set_point_lawan'] ?></span>
+                            <?php if (($game['divisi'] ?? 'recurve') === 'compound'): ?>
+                                <span class="text-[8px] font-bold text-slate-500 uppercase tracking-wide">Skor Akhir</span>
+                                <span class="text-sm font-extrabold text-amber-400 block mt-0.5"><?= $game['total_score'] ?> - <?= $game['total_score_lawan'] ?></span>
+                            <?php else: ?>
+                                <span class="text-[8px] font-bold text-slate-500 uppercase tracking-wide">Poin Set</span>
+                                <span class="text-sm font-extrabold text-amber-400 block mt-0.5"><?= $game['set_point_atlet'] ?> - <?= $game['set_point_lawan'] ?></span>
+                            <?php endif; ?>
                         <?php else: ?>
                             <span class="text-[8px] font-bold text-slate-500 uppercase tracking-wide">Total Skor</span>
                             <span class="text-sm font-extrabold text-emerald-400 block mt-0.5"><?= $game['total_score'] ?></span>

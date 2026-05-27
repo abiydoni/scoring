@@ -220,9 +220,9 @@ class Panahan extends BaseController
         // 1. Simpan skor Atlet Utama (is_lawan = 0)
         $athleteShootTotal = 0;
         foreach ($athleteArrows as $arrow) {
-            $score = intval($arrow->score);
-            $displayValue = $arrow->display_value;
-            $arrowNumber = intval($arrow->arrow_number);
+            $score = isset($arrow->score) ? intval($arrow->score) : 0;
+            $displayValue = isset($arrow->display_value) ? $arrow->display_value : '0';
+            $arrowNumber = isset($arrow->arrow_number) ? intval($arrow->arrow_number) : 0;
 
             $athleteShootTotal += $score;
 
@@ -276,9 +276,9 @@ class Panahan extends BaseController
         $opponentShootTotal = 0;
         if ($game['tipe_game'] === 'aduan' && $opponentArrows) {
             foreach ($opponentArrows as $arrow) {
-                $score = intval($arrow->score);
-                $displayValue = $arrow->display_value;
-                $arrowNumber = intval($arrow->arrow_number);
+                $score = isset($arrow->score) ? intval($arrow->score) : 0;
+                $displayValue = isset($arrow->display_value) ? $arrow->display_value : '0';
+                $arrowNumber = isset($arrow->arrow_number) ? intval($arrow->arrow_number) : 0;
 
                 $opponentShootTotal += $score;
 
@@ -363,16 +363,25 @@ class Panahan extends BaseController
                                                  ->first();
 
                     if ($atletSet && $lawanSet) {
-                        $atletScore = intval($atletSet['total_score']);
-                        $lawanScore = intval($lawanSet['total_score']);
+                        // Periksa apakah set ini sudah dimainkan (ada panah yang bukan '0' / kosong)
+                        $isSetShot = $this->shotModel->where('game_id', $gameId)
+                                                     ->where('session_number', $sessionNumber)
+                                                     ->where('shoot_number', $s)
+                                                     ->where('display_value !=', '0')
+                                                     ->countAllResults() > 0;
 
-                        if ($atletScore > $lawanScore) {
-                            $setPointAtlet += 2;
-                        } elseif ($atletScore === $lawanScore) {
-                            $setPointAtlet += 1;
-                            $setPointLawan += 1;
-                        } else {
-                            $setPointLawan += 2;
+                        if ($isSetShot) {
+                            $atletScore = intval($atletSet['total_score']);
+                            $lawanScore = intval($lawanSet['total_score']);
+
+                            if ($atletScore > $lawanScore) {
+                                $setPointAtlet += 2;
+                            } elseif ($atletScore === $lawanScore) {
+                                $setPointAtlet += 1;
+                                $setPointLawan += 1;
+                            } else {
+                                $setPointLawan += 2;
+                            }
                         }
                     }
                 }
