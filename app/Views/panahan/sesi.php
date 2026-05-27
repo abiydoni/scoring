@@ -570,7 +570,7 @@
         try {
             // Save each shoot/set sequentially or in parallel
             const savePromises = sessionsData.map(async (setInfo) => {
-                const response = await fetch(`/panahan/game/${game.id}/shoot`, {
+                const response = await fetch(`<?= base_url('panahan/game') ?>/${game.id}/shoot`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -602,7 +602,7 @@
                         timer: 1500,
                         showConfirmButton: false
                     }).then(() => {
-                        window.location.href = `/panahan/game/${game.id}`;
+                        window.location.href = `<?= base_url('panahan/game') ?>/${game.id}`;
                     });
                 } else {
                     Swal.fire({

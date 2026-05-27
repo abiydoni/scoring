@@ -281,7 +281,7 @@
                     </div>
                 <?php endif; ?>
                 
-                <a href="/panahan/game/<?= $game['id'] ?>/sesi/<?= $i ?>" class="px-3.5 py-2 <?= $hasScore && $game['tipe_game'] !== 'aduan' ? 'bg-brand-600/10 text-brand-400 border border-brand-500/15 hover:bg-brand-600 hover:text-white hover:border-brand-500' : 'bg-brand-600 text-white shadow-md shadow-brand-500/10' ?> rounded-2xl transition-all text-xs font-bold flex items-center gap-1 active:scale-95 duration-200">
+                <a href="<?= base_url('panahan/game/' . $game['id'] . '/sesi/' . $i) ?>" class="px-3.5 py-2 <?= $hasScore && $game['tipe_game'] !== 'aduan' ? 'bg-brand-600/10 text-brand-400 border border-brand-500/15 hover:bg-brand-600 hover:text-white hover:border-brand-500' : 'bg-brand-600 text-white shadow-md shadow-brand-500/10' ?> rounded-2xl transition-all text-xs font-bold flex items-center gap-1 active:scale-95 duration-200">
                     <span><?= $game['tipe_game'] === 'aduan' ? 'Masuk Scoring' : ($hasScore ? 'Lihat/Edit' : 'Input Skor') ?></span>
                     <i class='bx bx-edit text-xs shrink-0'></i>
                 </a>
