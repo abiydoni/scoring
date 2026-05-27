@@ -1,6 +1,15 @@
 <!DOCTYPE html>
-<html lang="id" class="h-full light-mode">
+<html lang="id" class="h-full">
 <head>
+    <script>
+        // Apply saved theme immediately to prevent flash of wrong theme
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.classList.remove('light-mode');
+        } else {
+            document.documentElement.classList.add('light-mode');
+        }
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $title ?? 'Scoring App' ?></title>
@@ -653,8 +662,13 @@
             ?>
             <div class="absolute bottom-0 inset-x-0 bg-slate-950/95 backdrop-blur-lg border-t border-slate-900 px-6 py-2.5 flex items-center justify-between shrink-0 z-30 md:rounded-b-[36px]">
                 <!-- Nav Item: Dashboard -->
-                <a href="/" class="flex flex-col items-center gap-1 group transition-all <?= $active_menu === 'dashboard' ? 'text-brand-400' : 'text-slate-500 hover:text-slate-300' ?>">
-                    <div class="w-12 h-7 rounded-full flex items-center justify-center transition-all <?= $active_menu === 'dashboard' ? 'bg-brand-500/20' : 'group-hover:bg-slate-800/30' ?>">
+                <?php 
+                    // Need to define brandColor here too for the Dashboard nav item since it is before Scoring nav item
+                    $caborNav = session()->get('active_cabor');
+                    $brandColorNav = ($caborNav && strtolower($caborNav) === 'bulutangkis') ? 'emerald' : 'brand';
+                ?>
+                <a href="/" class="flex flex-col items-center gap-1 group transition-all <?= $active_menu === 'dashboard' ? 'text-'.$brandColorNav.'-400' : 'text-slate-500 hover:text-slate-300' ?>">
+                    <div class="w-12 h-7 rounded-full flex items-center justify-center transition-all <?= $active_menu === 'dashboard' ? 'bg-'.$brandColorNav.'-500/20' : 'group-hover:bg-slate-800/30' ?>">
                         <i class='bx bx-home-alt text-xl'></i>
                     </div>
                     <span class="text-[10px] font-semibold tracking-wide">Dashboard</span>
@@ -664,25 +678,28 @@
                 <?php 
                     $cabor = session()->get('active_cabor');
                     $isComingSoon = false;
-                    if ($cabor && strtolower($cabor) === 'panahan') {
-                        $activeCaborLink = '/panahan';
+                    $caborLower = $cabor ? strtolower($cabor) : '';
+                    if ($caborLower === 'panahan' || $caborLower === 'bulutangkis') {
+                        $activeCaborLink = '/' . $caborLower;
                     } else if ($cabor) {
                         $activeCaborLink = '#';
                         $isComingSoon = true;
                     } else {
                         $activeCaborLink = '/sports';
                     }
+                    
+                    $brandColor = $caborLower === 'bulutangkis' ? 'emerald' : 'brand';
                 ?>
-                <a href="<?= $activeCaborLink ?>" <?= $isComingSoon ? "onclick=\"showGlobalComingSoon('".esc($cabor)."'); return false;\"" : "" ?> class="flex flex-col items-center gap-1 group transition-all <?= $active_menu === 'scoring' ? 'text-brand-400' : 'text-slate-500 hover:text-slate-300' ?>">
-                    <div class="w-12 h-7 rounded-full flex items-center justify-center transition-all <?= $active_menu === 'scoring' ? 'bg-brand-500/20' : 'group-hover:bg-slate-800/30' ?>">
-                        <i class='bx bx-target-lock text-xl'></i>
+                <a href="<?= $activeCaborLink ?>" <?= $isComingSoon ? "onclick=\"showGlobalComingSoon('".esc($cabor)."'); return false;\"" : "" ?> class="flex flex-col items-center gap-1 group transition-all <?= $active_menu === 'scoring' ? 'text-'.$brandColor.'-400' : 'text-slate-500 hover:text-slate-300' ?>">
+                    <div class="w-12 h-7 rounded-full flex items-center justify-center transition-all <?= $active_menu === 'scoring' ? 'bg-'.$brandColor.'-500/20' : 'group-hover:bg-slate-800/30' ?>">
+                        <i class='bx <?= $caborLower === 'bulutangkis' ? 'bx-tennis-ball' : 'bx-target-lock' ?> text-xl'></i>
                     </div>
                     <span class="text-[10px] font-semibold tracking-wide">Scoring</span>
                 </a>
 
                 <!-- Nav Item: Atlet -->
-                <a href="/anggota" class="flex flex-col items-center gap-1 group transition-all <?= $active_menu === 'anggota' ? 'text-brand-400' : 'text-slate-500 hover:text-slate-300' ?>">
-                    <div class="w-12 h-7 rounded-full flex items-center justify-center transition-all <?= $active_menu === 'anggota' ? 'bg-brand-500/20' : 'group-hover:bg-slate-800/30' ?>">
+                <a href="/anggota" class="flex flex-col items-center gap-1 group transition-all <?= $active_menu === 'anggota' ? 'text-'.$brandColor.'-400' : 'text-slate-500 hover:text-slate-300' ?>">
+                    <div class="w-12 h-7 rounded-full flex items-center justify-center transition-all <?= $active_menu === 'anggota' ? 'bg-'.$brandColor.'-500/20' : 'group-hover:bg-slate-800/30' ?>">
                         <i class='bx bx-group text-xl'></i>
                     </div>
                     <span class="text-[10px] font-semibold tracking-wide">Atlet</span>

@@ -63,21 +63,26 @@
                             <option value="P">Perempuan (W)</option>
                         </select>
                     </div>
-                    <div>
-                        <label for="divisi" class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Divisi <span class="text-rose-500">*</span></label>
-                        <select id="divisi" name="divisi" required class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-2xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-slate-100 text-xs transition-all outline-none appearance-none">
-                            <option value="">Pilih Divisi</option>
-                            <option value="recurve">Recurve</option>
-                            <option value="compound">Compound</option>
-                            <option value="standard">Standard Bow / Nasional</option>
-                            <option value="barebow">Barebow</option>
-                        </select>
-                    </div>
+                    <?php if (strtolower($activeCabor) === 'panahan'): ?>
+                        <div>
+                            <label for="divisi" class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Divisi <span class="text-rose-500">*</span></label>
+                            <select id="divisi" name="divisi" required class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-2xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-slate-100 text-xs transition-all outline-none appearance-none">
+                                <option value="">Pilih Divisi</option>
+                                <option value="recurve">Recurve</option>
+                                <option value="compound">Compound</option>
+                                <option value="standard">Standard Bow / Nasional</option>
+                                <option value="barebow">Barebow</option>
+                            </select>
+                        </div>
+                    <?php else: ?>
+                        <!-- Hidden divisi for other sports -->
+                        <input type="hidden" id="divisi" name="divisi" value="">
+                    <?php endif; ?>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label for="klub" class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Klub Panahan</label>
-                        <input type="text" id="klub" name="klub" placeholder="Contoh: X-Ten Archery" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-2xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-slate-100 placeholder-slate-600 text-xs transition-all outline-none" />
+                        <label for="klub" class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Klub <?= esc(ucwords(strtolower($activeCabor))) ?></label>
+                        <input type="text" id="klub" name="klub" placeholder="Contoh: <?= strtolower($activeCabor) === 'panahan' ? 'X-Ten Archery' : 'PB Djarum' ?>" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-2xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-slate-100 placeholder-slate-600 text-xs transition-all outline-none" />
                     </div>
                     <div>
                         <label for="kota" class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Kota Asal</label>
@@ -126,7 +131,7 @@
                                 <?php endif; ?>
                                 <?php if (!empty($person['divisi'])): ?>
                                     <span class="flex items-center gap-1">
-                                        <i class='bx bx-target-lock text-xs text-brand-400/85'></i>
+                                        <i class='bx <?= strtolower($activeCabor) === 'panahan' ? 'bx-target-lock' : 'bx-purchase-tag' ?> text-xs text-brand-400/85'></i>
                                         <span class="capitalize"><?= esc($person['divisi']) ?></span>
                                     </span>
                                 <?php endif; ?>
@@ -143,8 +148,8 @@
                                     </span>
                                 <?php endif; ?>
                                 <span class="flex items-center gap-1">
-                                    <i class='bx bx-run text-xs text-brand-400/85'></i>
-                                    <span class="font-bold text-slate-300"><?= esc($person['cabor'] ?? 'Panahan') ?></span>
+                                    <i class='bx <?= strtolower($activeCabor) === 'panahan' ? 'bx-run' : 'bx-tennis-ball' ?> text-xs text-brand-400/85'></i>
+                                    <span class="font-bold text-slate-300"><?= esc($person['cabor'] ?? $activeCabor) ?></span>
                                 </span>
                             </div>
                         </div>
@@ -184,7 +189,9 @@
             document.getElementById('telepon').value = data.telepon || '';
             document.getElementById('email').value = data.email || '';
             document.getElementById('jenis_kelamin').value = data.jenis_kelamin || '';
-            document.getElementById('divisi').value = data.divisi || '';
+            if (document.getElementById('divisi')) {
+                document.getElementById('divisi').value = data.divisi || '';
+            }
             document.getElementById('klub').value = data.klub || '';
             document.getElementById('kota').value = data.kota || '';
         }

@@ -5,6 +5,8 @@ namespace App\Controllers;
 use App\Models\AnggotaModel;
 use App\Models\PanahanGameModel;
 use App\Models\PanahanShotModel;
+use App\Models\BulutangkisMatchModel;
+use App\Models\BulutangkisGameModel;
 
 class Home extends BaseController
 {
@@ -62,6 +64,32 @@ class Home extends BaseController
             foreach ($recentGames as $rg) {
                 $chartLabels[] = explode(' ', $rg['nama_anggota'])[0] . ' (' . date('d/m', strtotime($rg['tanggal'])) . ')';
                 $chartScores[] = $rg['total_score'];
+            }
+        } else if (strtolower($activeCabor) === 'bulutangkis') {
+            $bmModel = new BulutangkisMatchModel();
+            $bgModel = new BulutangkisGameModel();
+
+            $totalGames = $bmModel->countAllResults();
+            $totalShots = $bgModel->countAllResults(); // we map 'shots' to 'games/sets' for bulutangkis stats
+
+            $latestGames = $bmModel->select('bulutangkis_match.*, anggota.nama as nama_anggota')
+                                     ->join('anggota', 'anggota.id = bulutangkis_match.anggota_id')
+                                     ->orderBy('bulutangkis_match.tanggal', 'DESC')
+                                     ->orderBy('bulutangkis_match.id', 'DESC')
+                                     ->limit(4)
+                                     ->find();
+                                     
+            $recentMatches = $bmModel->select('bulutangkis_match.*, anggota.nama as nama_anggota')
+                                     ->join('anggota', 'anggota.id = bulutangkis_match.anggota_id')
+                                     ->orderBy('bulutangkis_match.tanggal', 'ASC')
+                                     ->orderBy('bulutangkis_match.id', 'ASC')
+                                     ->limit(6)
+                                     ->find();
+
+            foreach ($recentMatches as $rm) {
+                $chartLabels[] = explode(' ', $rm['nama_anggota'])[0] . ' (' . date('d/m', strtotime($rm['tanggal'])) . ')';
+                // For bulutangkis, maybe chart score is win difference? Or just total sets won?
+                $chartScores[] = $rm['set_menang_atlet'];
             }
         }
 
