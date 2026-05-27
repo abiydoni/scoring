@@ -717,7 +717,14 @@
             // Show beautiful, smooth transparent loader instantly
             showLoading('MEMUAT HALAMAN', 'Sedang mengambil data...', false);
 
-            fetch(url)
+            // Fetch URL but disable caching so that data is always fresh (no stale pages on navigation)
+            fetch(url, { 
+                cache: 'no-store',
+                headers: {
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache'
+                }
+            })
                 .then(res => {
                     if (!res.ok) throw new Error('HTTP error ' + res.status);
                     return res.text();
