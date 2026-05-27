@@ -568,10 +568,11 @@
         showLoading('MENYIMPAN SKOR', 'Memproses perhitungan total skor...');
 
         try {
-            // Save each shoot/set sequentially or in parallel
-            const savePromises = sessionsData.map(async (setInfo) => {
-                // Derive API URL from current browser URL to prevent base_url() misconfiguration issues
-                const baseUrl = window.location.href.split('/sesi')[0];
+            // Save each shoot/set sequentially to prevent SQLite database locking on concurrent production servers
+            const baseUrl = window.location.href.split('/sesi')[0];
+            const results = [];
+            
+            for (const setInfo of sessionsData) {
                 const response = await fetch(`${baseUrl}/shoot`, {
                     method: 'POST',
                     headers: {
@@ -584,10 +585,9 @@
                         opponent_arrows: setInfo.opponent_arrows
                     })
                 });
-                return await response.json();
-            });
-
-            const results = await Promise.all(savePromises);
+                const result = await response.json();
+                results.push(result);
+            }
             const failed = results.filter(r => !r.success);
 
             hideLoading();
