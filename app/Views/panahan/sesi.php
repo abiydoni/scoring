@@ -59,7 +59,7 @@
                 <thead class="bg-slate-900/60 border-b border-slate-800/80">
                     <tr>
                         <th class="w-6 min-[380px]:w-8 py-3 text-center text-[9px] font-black text-slate-400 uppercase tracking-widest border-r border-slate-800/30">Set</th>
-                        <th colspan="<?= $numArrows ?>" class="py-3 text-center text-[9px] font-black text-brand-400 uppercase tracking-widest">
+                        <th class="py-3 text-center text-[9px] font-black text-brand-400 uppercase tracking-widest">
                             <?= esc(explode(' ', $game['nama_anggota'])[0]) ?>
                             <?= $game['tipe_game'] === 'mixteam' ? ' & ' . esc(explode(' ', $game['partner_nama'])[0]) : '' ?>
                         </th>
@@ -68,7 +68,7 @@
                             <?= ($game['divisi'] === 'compound' || $game['divisi'] === 'barebow') ? 'Lead' : 'Poin' ?>
                         </th>
                         <th class="w-6 min-[380px]:w-8 py-3 text-center text-[9px] font-black text-slate-500 uppercase tracking-widest">Tot</th>
-                        <th colspan="<?= $numArrows ?>" class="py-3 text-center pr-2 min-[380px]:pr-4 text-[9px] font-black text-amber-400 uppercase tracking-widest"><?= esc(explode(' ', $namaLawan)[0]) ?></th>
+                        <th class="py-3 text-center pr-2 min-[380px]:pr-4 text-[9px] font-black text-amber-400 uppercase tracking-widest"><?= esc(explode(' ', $namaLawan)[0]) ?></th>
                     </tr>
                 </thead>
                 <tbody id="shootsTableBody" class="divide-y divide-slate-800/40">
@@ -76,11 +76,11 @@
                 </tbody>
                 <tfoot class="bg-slate-900/70 border-t border-slate-800">
                     <tr>
-                        <td colspan="<?= $numArrows + 1 ?>" class="px-3 pt-3.5 pb-6 text-left text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Skor Akumulatif</td>
+                        <td colspan="2" class="px-3 pt-3.5 pb-6 text-left text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Skor Akumulatif</td>
                         <td class="pt-3.5 pb-6 text-center text-xs font-black text-brand-400" id="totalScoreAtlet">0</td>
                         <td class="pt-3.5 pb-6 text-center text-[9px] font-black text-slate-500 uppercase tracking-widest border-x border-slate-800">Skor Akhir</td>
                         <td class="pt-3.5 pb-6 text-center text-xs font-black text-amber-400" id="totalScoreLawan">0</td>
-                        <td colspan="<?= $numArrows ?>" class="pt-3.5 pb-6"></td>
+                        <td class="pt-3.5 pb-6 pr-2 min-[380px]:pr-4"></td>
                     </tr>
                 </tfoot>
             </table>
@@ -91,7 +91,7 @@
                 <thead class="bg-slate-900/60 border-b border-slate-800/80">
                     <tr>
                         <th class="w-8 min-[380px]:w-12 py-3 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Rbh</th>
-                        <th colspan="6" class="py-3 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Nilai Anak Panah</th>
+                        <th class="py-3 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Nilai Anak Panah</th>
                         <th class="w-10 min-[380px]:w-14 py-3 text-center pr-2 min-[380px]:pr-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Tot</th>
                     </tr>
                 </thead>
@@ -100,7 +100,7 @@
                 </tbody>
                 <tfoot class="bg-slate-900/70 border-t border-slate-800">
                     <tr>
-                        <td colspan="7" class="px-5 pt-4 pb-6 text-left text-xs font-extrabold text-slate-400 uppercase tracking-widest">Grand Total Sesi</td>
+                        <td colspan="2" class="px-5 pt-4 pb-6 text-left text-xs font-extrabold text-slate-400 uppercase tracking-widest">Grand Total Sesi</td>
                         <td class="pt-4 pb-6 pr-2 min-[380px]:pr-4 text-center text-base font-black text-emerald-400" id="grandTotal">0</td>
                     </tr>
                 </tfoot>
@@ -225,21 +225,23 @@
                         <td class="py-3 text-center text-xs font-bold text-slate-500 border-r border-slate-800/40">${setNum}</td>
                         
                         <!-- Atlet Buttons -->
-                        ${atletData.map((arrow, idx) => {
-                            const arrowNum = idx + 1;
-                            return `
-                                <td class="py-2 text-center px-0 min-[380px]:px-0.5">
-                                    <button type="button" 
-                                        data-shoot="${setNum}" 
-                                        data-arrow="${arrowNum}"
-                                        data-lawan="0"
-                                        onclick="openScorePicker(${setNum}, ${arrowNum}, 0, ${arrow.score}, '${arrow.display}')"
-                                        class="w-6 h-6 min-[380px]:w-7 min-[380px]:h-7 md:w-8 md:h-8 rounded-full font-black text-[10px] min-[380px]:text-xs md:text-sm border min-[380px]:border-2 text-center transition-all active:scale-90 mx-auto ${getScoreClass(arrow.score, arrow.display)}">
-                                        ${arrow.display}
-                                    </button>
-                                </td>
-                            `;
-                        }).join('')}
+                        <td class="py-2 px-1">
+                            <div class="flex items-center justify-center gap-[1px] md:gap-0.5">
+                                ${atletData.map((arrow, idx) => {
+                                    const arrowNum = idx + 1;
+                                    return `
+                                        <button type="button" 
+                                            data-shoot="${setNum}" 
+                                            data-arrow="${arrowNum}"
+                                            data-lawan="0"
+                                            onclick="openScorePicker(${setNum}, ${arrowNum}, 0, ${arrow.score}, '${arrow.display}')"
+                                            class="shrink-0 aspect-square w-6 h-6 min-[380px]:w-7 min-[380px]:h-7 md:w-8 md:h-8 rounded-full font-black text-[10px] min-[380px]:text-xs md:text-sm border min-[380px]:border-2 text-center transition-all active:scale-90 flex items-center justify-center ${getScoreClass(arrow.score, arrow.display)}">
+                                            ${arrow.display}
+                                        </button>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </td>
                         
                         <!-- Atlet Total Set Score -->
                         <td class="py-3 text-center text-xs font-black text-brand-400 border-l border-slate-800/20" id="atlet-total-${setNum}">${atletTotal}</td>
@@ -251,22 +253,23 @@
                         <td class="py-3 text-center text-xs font-black text-amber-400 border-r border-slate-800/20" id="lawan-total-${setNum}">${lawanTotal}</td>
 
                         <!-- Lawan Buttons -->
-                        ${lawanData.map((arrow, idx) => {
-                            const arrowNum = idx + 1;
-                            const isLast = idx === lawanData.length - 1;
-                            return `
-                                <td class="py-2 text-center ${isLast ? 'pl-0 min-[380px]:pl-0.5 pr-2 min-[380px]:pr-4' : 'px-0 min-[380px]:px-0.5'}">
-                                    <button type="button" 
-                                        data-shoot="${setNum}" 
-                                        data-arrow="${arrowNum}"
-                                        data-lawan="1"
-                                        onclick="openScorePicker(${setNum}, ${arrowNum}, 1, ${arrow.score}, '${arrow.display}')"
-                                        class="w-6 h-6 min-[380px]:w-7 min-[380px]:h-7 md:w-8 md:h-8 rounded-full font-black text-[10px] min-[380px]:text-xs md:text-sm border min-[380px]:border-2 text-center transition-all active:scale-90 mx-auto ${getScoreClass(arrow.score, arrow.display)}">
-                                        ${arrow.display}
-                                    </button>
-                                </td>
-                            `;
-                        }).join('')}
+                        <td class="py-2 pr-2 min-[380px]:pr-4 pl-3 min-[380px]:pl-4">
+                            <div class="flex items-center justify-center gap-[1px] md:gap-0.5">
+                                ${lawanData.map((arrow, idx) => {
+                                    const arrowNum = idx + 1;
+                                    return `
+                                        <button type="button" 
+                                            data-shoot="${setNum}" 
+                                            data-arrow="${arrowNum}"
+                                            data-lawan="1"
+                                            onclick="openScorePicker(${setNum}, ${arrowNum}, 1, ${arrow.score}, '${arrow.display}')"
+                                            class="shrink-0 aspect-square w-6 h-6 min-[380px]:w-7 min-[380px]:h-7 md:w-8 md:h-8 rounded-full font-black text-[10px] min-[380px]:text-xs md:text-sm border min-[380px]:border-2 text-center transition-all active:scale-90 flex items-center justify-center ${getScoreClass(arrow.score, arrow.display)}">
+                                            ${arrow.display}
+                                        </button>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </td>
                     </tr>
                 `;
             }
@@ -289,22 +292,23 @@
                 html += `
                     <tr class="hover:bg-slate-900/20 transition-colors" data-shoot="${shootNum}">
                         <td class="py-3 text-center text-xs font-bold text-slate-500 border-r border-slate-800/40">${shootNum}</td>
-                        ${arrowData.map((arrow, idx) => {
-                            const arrowNum = idx + 1;
-                            const isLast = idx === arrowData.length - 1;
-                            return `
-                                <td class="py-2 text-center ${isLast ? 'pl-0 min-[380px]:pl-0.5 pr-2 min-[380px]:pr-4' : 'px-0 min-[380px]:px-0.5'}">
-                                    <button type="button" 
-                                        data-shoot="${shootNum}" 
-                                        data-arrow="${arrowNum}"
-                                        data-lawan="0"
-                                        onclick="openScorePicker(${shootNum}, ${arrowNum}, 0, ${arrow.score}, '${arrow.display}')"
-                                        class="w-7 h-7 min-[380px]:w-8 min-[380px]:h-8 md:w-10 md:h-10 rounded-full font-black text-xs min-[380px]:text-sm border-2 text-center transition-all active:scale-90 mx-auto ${getScoreClass(arrow.score, arrow.display)}">
-                                        ${arrow.display}
-                                    </button>
-                                </td>
-                            `;
-                        }).join('')}
+                        <td class="py-2 px-1">
+                            <div class="flex items-center justify-center gap-[1px] md:gap-0.5">
+                                ${arrowData.map((arrow, idx) => {
+                                    const arrowNum = idx + 1;
+                                    return `
+                                        <button type="button" 
+                                            data-shoot="${shootNum}" 
+                                            data-arrow="${arrowNum}"
+                                            data-lawan="0"
+                                            onclick="openScorePicker(${shootNum}, ${arrowNum}, 0, ${arrow.score}, '${arrow.display}')"
+                                            class="shrink-0 aspect-square w-7 h-7 min-[380px]:w-8 min-[380px]:h-8 md:w-10 md:h-10 rounded-full font-black text-xs min-[380px]:text-sm border-2 text-center transition-all active:scale-90 flex items-center justify-center ${getScoreClass(arrow.score, arrow.display)}">
+                                            ${arrow.display}
+                                        </button>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </td>
                         <td class="py-3 text-center text-sm font-black text-slate-300 border-l border-slate-800/40 pr-2 min-[380px]:pr-4" id="total-${shootNum}">${total}</td>
                     </tr>
                 `;
