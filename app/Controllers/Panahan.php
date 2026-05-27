@@ -28,7 +28,7 @@ class Panahan extends BaseController
         $data = [
             'title'       => 'Scoring Panahan',
             'active_menu' => 'scoring',
-            'anggota'     => $this->anggotaModel->orderBy('nama', 'ASC')->findAll(),
+            'anggota'     => $this->anggotaModel->where('cabor', 'Panahan')->orderBy('nama', 'ASC')->findAll(),
         ];
 
         return view('panahan/index', $data);
@@ -43,7 +43,7 @@ class Panahan extends BaseController
         }
 
         // Get all athletes EXCEPT current one for the opponent dropdown
-        $opponents = $this->anggotaModel->where('id !=', $athleteId)->orderBy('nama', 'ASC')->findAll();
+        $opponents = $this->anggotaModel->where('id !=', $athleteId)->where('cabor', 'Panahan')->orderBy('nama', 'ASC')->findAll();
 
         $data = [
             'title'       => 'History Scoring - ' . explode(' ', $athlete['nama'])[0],

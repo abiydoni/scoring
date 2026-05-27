@@ -19,13 +19,19 @@
         <h3 id="form-modal-title" class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-4">Tambah Atlet Baru</h3>
         <form id="athlete-form" action="/anggota/store" method="POST">
             <div class="space-y-3.5">
-                <div>
-                    <label for="nama" class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Nama Lengkap <span class="text-rose-500">*</span></label>
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
-                            <i class='bx bx-user text-base'></i>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Cabang Olahraga</label>
+                        <input type="text" value="<?= esc($activeCabor ?? 'Panahan') ?>" readonly class="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700/50 rounded-2xl text-slate-400 text-xs cursor-not-allowed outline-none" />
+                    </div>
+                    <div>
+                        <label for="nama" class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Nama Lengkap <span class="text-rose-500">*</span></label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                                <i class='bx bx-user text-base'></i>
+                            </div>
+                            <input type="text" id="nama" name="nama" required placeholder="Nama atlet" class="w-full pl-10 pr-4 py-2.5 bg-slate-900 border border-slate-800 rounded-2xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-slate-100 placeholder-slate-600 text-xs transition-all outline-none" />
                         </div>
-                        <input type="text" id="nama" name="nama" required placeholder="Masukkan nama lengkap atlet" class="w-full pl-10 pr-4 py-2.5 bg-slate-900 border border-slate-800 rounded-2xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-slate-100 placeholder-slate-600 text-xs transition-all outline-none" />
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
@@ -136,6 +142,10 @@
                                         <?= esc($person['kota']) ?>
                                     </span>
                                 <?php endif; ?>
+                                <span class="flex items-center gap-1">
+                                    <i class='bx bx-run text-xs text-brand-400/85'></i>
+                                    <span class="font-bold text-slate-300"><?= esc($person['cabor'] ?? 'Panahan') ?></span>
+                                </span>
                             </div>
                         </div>
                     </div>

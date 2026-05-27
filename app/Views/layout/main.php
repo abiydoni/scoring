@@ -596,12 +596,17 @@
                     </a>
                 <?php endif; ?>
                 <div>
-                    <h1 class="text-lg font-bold bg-gradient-to-r from-white via-slate-100 to-slate-300 bg-clip-text text-transparent">
+                    <h1 class="text-lg font-bold bg-gradient-to-r from-white via-slate-100 to-slate-300 bg-clip-text text-transparent flex items-center gap-2">
                         <?= $title ?? 'Scoring' ?>
                     </h1>
                 </div>
             </div>
-            <div>
+            <div class="flex items-center gap-2">
+                <?php if (session()->get('active_cabor') && (!isset($hide_ganti_cabor) || !$hide_ganti_cabor)): ?>
+                    <a href="/sports" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/20 hover:bg-brand-500/20 text-brand-400 hover:text-brand-300 text-[10px] font-bold uppercase tracking-wider transition-all">
+                        <i class='bx bx-refresh text-sm'></i> Ganti
+                    </a>
+                <?php endif; ?>
                 <button onclick="toggleDarkMode()" class="w-8 h-8 rounded-full bg-slate-800/60 hover:bg-slate-800 flex items-center justify-center text-slate-300 hover:text-white transition-all">
                     <i class='bx bx-brightness-half text-lg'></i>
                 </button>
@@ -627,37 +632,66 @@
 
             <!-- Render views here -->
             <?= $this->renderSection('content') ?>
+            
+            <!-- Animated Copyright Footer -->
+            <div class="mt-12 mb-6 flex flex-col items-center justify-center text-center animate-[pulse_4s_ease-in-out_infinite] select-none">
+                <div class="flex items-center justify-center gap-1.5 mb-1.5">
+                    <span class="w-6 h-[1px] bg-gradient-to-r from-transparent to-brand-500/50"></span>
+                    <i class='bx bxs-bolt text-brand-400 text-sm animate-bounce'></i>
+                    <span class="w-6 h-[1px] bg-gradient-to-l from-transparent to-brand-500/50"></span>
+                </div>
+                <p class="text-[10px] font-medium text-slate-500">
+                    &copy; <?= date('Y') ?> <a href="https://appsbee.my.id" target="_blank" class="font-bold text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-sky-400 hover:from-brand-300 hover:to-sky-300 transition-all">Appsbee.my.id</a>
+                </p>
+                <a href="https://wa.me/6285225106200" target="_blank" class="mt-1 flex items-center gap-1 text-[9px] font-bold text-slate-400 hover:text-emerald-400 transition-colors group">
+                    <i class='bx bxl-whatsapp text-emerald-500 group-hover:scale-125 transition-transform'></i> 0852-2510-6200
+                </a>
+            </div>
         </div>
 
         <!-- Bottom Navigation Bar (Android Premium Style) -->
-        <?php 
-            $active_menu = $active_menu ?? 'dashboard'; 
-        ?>
-        <div class="absolute bottom-0 inset-x-0 bg-slate-950/95 backdrop-blur-lg border-t border-slate-900 px-6 py-2.5 flex items-center justify-between shrink-0 z-30 md:rounded-b-[36px]">
-            <!-- Nav Item: Dashboard -->
-            <a href="/" class="flex flex-col items-center gap-1 group transition-all <?= $active_menu === 'dashboard' ? 'text-brand-400' : 'text-slate-500 hover:text-slate-300' ?>">
-                <div class="w-12 h-7 rounded-full flex items-center justify-center transition-all <?= $active_menu === 'dashboard' ? 'bg-brand-500/20' : 'group-hover:bg-slate-800/30' ?>">
-                    <i class='bx bx-home-alt text-xl'></i>
-                </div>
-                <span class="text-[10px] font-semibold tracking-wide">Dashboard</span>
-            </a>
+        <?php if (!isset($hide_bottom_nav) || !$hide_bottom_nav): ?>
+            <?php 
+                $active_menu = $active_menu ?? 'dashboard'; 
+            ?>
+            <div class="absolute bottom-0 inset-x-0 bg-slate-950/95 backdrop-blur-lg border-t border-slate-900 px-6 py-2.5 flex items-center justify-between shrink-0 z-30 md:rounded-b-[36px]">
+                <!-- Nav Item: Dashboard -->
+                <a href="/" class="flex flex-col items-center gap-1 group transition-all <?= $active_menu === 'dashboard' ? 'text-brand-400' : 'text-slate-500 hover:text-slate-300' ?>">
+                    <div class="w-12 h-7 rounded-full flex items-center justify-center transition-all <?= $active_menu === 'dashboard' ? 'bg-brand-500/20' : 'group-hover:bg-slate-800/30' ?>">
+                        <i class='bx bx-home-alt text-xl'></i>
+                    </div>
+                    <span class="text-[10px] font-semibold tracking-wide">Dashboard</span>
+                </a>
 
-            <!-- Nav Item: Scoring -->
-            <a href="/sports" class="flex flex-col items-center gap-1 group transition-all <?= $active_menu === 'scoring' ? 'text-brand-400' : 'text-slate-500 hover:text-slate-300' ?>">
-                <div class="w-12 h-7 rounded-full flex items-center justify-center transition-all <?= $active_menu === 'scoring' ? 'bg-brand-500/20' : 'group-hover:bg-slate-800/30' ?>">
-                    <i class='bx bx-target-lock text-xl'></i>
-                </div>
-                <span class="text-[10px] font-semibold tracking-wide">Scoring</span>
-            </a>
+                <!-- Nav Item: Scoring -->
+                <?php 
+                    $cabor = session()->get('active_cabor');
+                    $isComingSoon = false;
+                    if ($cabor && strtolower($cabor) === 'panahan') {
+                        $activeCaborLink = '/panahan';
+                    } else if ($cabor) {
+                        $activeCaborLink = '#';
+                        $isComingSoon = true;
+                    } else {
+                        $activeCaborLink = '/sports';
+                    }
+                ?>
+                <a href="<?= $activeCaborLink ?>" <?= $isComingSoon ? "onclick=\"showGlobalComingSoon('".esc($cabor)."'); return false;\"" : "" ?> class="flex flex-col items-center gap-1 group transition-all <?= $active_menu === 'scoring' ? 'text-brand-400' : 'text-slate-500 hover:text-slate-300' ?>">
+                    <div class="w-12 h-7 rounded-full flex items-center justify-center transition-all <?= $active_menu === 'scoring' ? 'bg-brand-500/20' : 'group-hover:bg-slate-800/30' ?>">
+                        <i class='bx bx-target-lock text-xl'></i>
+                    </div>
+                    <span class="text-[10px] font-semibold tracking-wide">Scoring</span>
+                </a>
 
-            <!-- Nav Item: Atlet -->
-            <a href="/anggota" class="flex flex-col items-center gap-1 group transition-all <?= $active_menu === 'anggota' ? 'text-brand-400' : 'text-slate-500 hover:text-slate-300' ?>">
-                <div class="w-12 h-7 rounded-full flex items-center justify-center transition-all <?= $active_menu === 'anggota' ? 'bg-brand-500/20' : 'group-hover:bg-slate-800/30' ?>">
-                    <i class='bx bx-group text-xl'></i>
-                </div>
-                <span class="text-[10px] font-semibold tracking-wide">Atlet</span>
-            </a>
-        </div>
+                <!-- Nav Item: Atlet -->
+                <a href="/anggota" class="flex flex-col items-center gap-1 group transition-all <?= $active_menu === 'anggota' ? 'text-brand-400' : 'text-slate-500 hover:text-slate-300' ?>">
+                    <div class="w-12 h-7 rounded-full flex items-center justify-center transition-all <?= $active_menu === 'anggota' ? 'bg-brand-500/20' : 'group-hover:bg-slate-800/30' ?>">
+                        <i class='bx bx-group text-xl'></i>
+                    </div>
+                    <span class="text-[10px] font-semibold tracking-wide">Atlet</span>
+                </a>
+            </div>
+        <?php endif; ?>
 
         <!-- Full-screen Custom Sports Loading Overlay (Inside mobile-frame to clip beautifully, styled with pure premium-loader CSS) -->
         <div id="sports-loading-overlay" class="premium-loader">
@@ -778,6 +812,19 @@
                     // Fallback to native navigation in case of error
                     window.location.href = url;
                 });
+        }
+
+        // Global Coming Soon Alert for Bottom Nav
+        function showGlobalComingSoon(sportName) {
+            Swal.fire({
+                title: sportName,
+                text: `Modul scoring pertandingan untuk ${sportName} sedang dalam tahap pengembangan. Pantau terus pembaruan berikutnya!`,
+                icon: 'info',
+                background: (document.documentElement.classList.contains('light-mode') ? '#ffffff' : '#1e293b'),
+                color: (document.documentElement.classList.contains('light-mode') ? '#0f172a' : '#f8fafc'),
+                confirmButtonColor: '#8b5cf6',
+                confirmButtonText: 'Siap, Ditunggu!'
+            });
         }
 
         function showLoading(title = 'MEMPROSES DATA', subtitle = 'Harap tunggu sebentar...', isPageTransition = false) {

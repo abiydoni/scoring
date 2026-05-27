@@ -1,101 +1,105 @@
+<?php 
+    $activeCabor = session()->get('active_cabor') ?? ''; 
+?>
 <?= $this->extend('layout/main') ?>
 
 <?= $this->section('content') ?>
 
-<!-- Header Intro -->
-<div class="mb-5 select-none">
-    <span class="text-xs font-semibold text-brand-400 uppercase tracking-wider">Cabang Olahraga</span>
-    <h2 class="text-xl font-bold text-white mt-0.5">Pilih Modul Scoring</h2>
-    <p class="text-xs text-slate-400 mt-1 leading-relaxed">Silakan pilih cabang olahraga di bawah ini untuk memulai pencatatan dan penilaian skor latihan.</p>
+<!-- Full Width Header Image (Touches edges and top header) -->
+<div class="relative -mx-4 -mt-4 animate-[slideDown_0.5s_ease-out]">
+    <img src="/appsbee_header.png" alt="Appsbee Header" class="w-full h-auto object-contain drop-shadow-lg" />
 </div>
 
-<!-- Sports Grid (2 Columns, Android Premium Feel) -->
-<div class="grid grid-cols-2 gap-4 mb-6">
+<!-- Header Intro with Animation -->
+<!-- Negative top margin (-mt-32) pulls this text up heavily so it overlaps higher up on the image -->
+<div class="relative z-10 -mt-32 mb-10 select-none animate-[slideDown_0.6s_ease-out] flex flex-col items-center text-center">
+    <h2 class="text-3xl font-black text-white tracking-tight drop-shadow-lg">Modul Scoring</h2>
+    <p class="text-xs text-slate-300 mt-2.5 leading-relaxed max-w-[90%] drop-shadow-md">Pilih cabang olahraga di bawah ini untuk memulai pencatatan statistik dan skor pertandingan secara presisi.</p>
+</div>
+
+<!-- Sports Grid (Vibrant Full-Color Cards) -->
+<div class="flex flex-col gap-5 mb-8">
     
-    <!-- Sport: Panahan (Active) -->
-    <a href="/panahan" class="group bg-slate-800/40 hover:bg-slate-800/70 border border-brand-500/20 hover:border-brand-500/50 p-4 rounded-3xl flex flex-col items-center justify-center text-center transition-all duration-300 transform active:scale-95 shadow-lg shadow-brand-500/5 min-h-[140px] relative overflow-hidden">
-        <div class="absolute -right-6 -top-6 w-16 h-16 bg-brand-500/10 rounded-full blur-xl group-hover:bg-brand-500/20 transition-all"></div>
-        <div class="w-14 h-14 rounded-2xl bg-brand-500/15 border border-brand-500/30 flex items-center justify-center text-brand-400 mb-3 group-hover:scale-110 transition-all shadow-inner shadow-brand-500/10">
-            <i class='bx bx-target-lock text-3xl'></i>
+    <?php
+    $sports = [
+        [
+            'name' => 'Panahan', 
+            'icon' => 'bx-target-lock', 
+            'gradient' => 'from-violet-600 via-fuchsia-600 to-rose-500', 
+            'shadow' => 'shadow-fuchsia-500/40',
+            'desc' => 'Scoring Target & Aduan'
+        ],
+        [
+            'name' => 'Bulutangkis', 
+            'icon' => 'bx-tennis-ball', 
+            'gradient' => 'from-emerald-500 via-teal-500 to-cyan-600', 
+            'shadow' => 'shadow-teal-500/40',
+            'desc' => 'Scoring Rally Point'
+        ]
+    ];
+    
+    $delay = 0;
+    foreach ($sports as $sport):
+        $isActive = (strtolower($activeCabor) === strtolower($sport['name']));
+        $delay += 150;
+    ?>
+    <a href="/sports/select/<?= esc($sport['name']) ?>" style="animation-delay: <?= $delay ?>ms;" class="group relative overflow-hidden rounded-[2rem] flex flex-col p-6 transition-all duration-500 hover:-translate-y-2 hover:scale-[1.02] hover:shadow-2xl <?= $sport['shadow'] ?> active:scale-95 animate-[slideUp_0.6s_ease-out_both] <?= $isActive ? 'ring-4 ring-white/30' : '' ?>">
+        
+        <!-- Vibrant Gradient Background -->
+        <div class="absolute inset-0 bg-gradient-to-br <?= $sport['gradient'] ?> opacity-90 group-hover:opacity-100 transition-opacity duration-500"></div>
+        
+        <!-- Animated Background Pattern / Particles -->
+        <div class="absolute inset-0 opacity-20 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjIiIGZpbGw9IiNmZmZmZmYiLz48L3N2Zz4=')] bg-[length:16px_16px] group-hover:scale-110 transition-transform duration-700"></div>
+        
+        <!-- Giant Background Icon -->
+        <i class='bx <?= $sport['icon'] ?> absolute -bottom-6 -right-4 text-9xl text-white/10 group-hover:text-white/20 group-hover:rotate-12 transition-all duration-700'></i>
+
+        <!-- Content Container (Glassmorphic) -->
+        <div class="relative z-10 flex items-center justify-between">
+            <div>
+                <!-- Icon Box -->
+                <div class="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white mb-4 shadow-inner group-hover:bg-white/30 transition-colors duration-300">
+                    <i class='bx <?= $sport['icon'] ?> text-3xl group-hover:scale-110 transition-transform duration-300'></i>
+                </div>
+                
+                <h3 class="text-2xl font-black text-white tracking-wide mb-1 drop-shadow-md"><?= esc($sport['name']) ?></h3>
+                <p class="text-xs font-semibold text-white/80 drop-shadow-sm flex items-center gap-1.5">
+                    <i class='bx bx-check-shield'></i> <?= esc($sport['desc']) ?>
+                </p>
+            </div>
+            
+            <!-- Arrow / Active Indicator -->
+            <div class="flex items-center justify-center w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 group-hover:bg-white/20 transition-all duration-300">
+                <?php if ($isActive): ?>
+                    <i class='bx bx-check text-2xl text-white drop-shadow-md animate-[bounce_2s_infinite]'></i>
+                <?php else: ?>
+                    <i class='bx bx-right-arrow-alt text-2xl text-white group-hover:translate-x-1 transition-transform duration-300'></i>
+                <?php endif; ?>
+            </div>
         </div>
-        <span class="text-sm font-bold text-white block">Panahan</span>
-        <span class="text-[10px] text-brand-400 mt-1 font-semibold block px-2.5 py-0.5 bg-brand-500/10 rounded-full border border-brand-500/25">Aktif</span>
+
+        <?php if ($isActive): ?>
+            <!-- Active Badge -->
+            <div class="absolute top-4 right-4 bg-white/20 backdrop-blur-md border border-white/30 px-3 py-1 rounded-full flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+                <span class="text-[9px] font-black text-white tracking-widest uppercase">Aktif</span>
+            </div>
+        <?php endif; ?>
+        
     </a>
-
-    <!-- Sport: Menembak (Coming Soon) -->
-    <button onclick="showComingSoon('Menembak')" class="group bg-slate-800/20 border border-slate-800/60 p-4 rounded-3xl flex flex-col items-center justify-center text-center transition-all duration-300 transform active:scale-95 min-h-[140px] relative overflow-hidden select-none">
-        <div class="absolute right-3 top-3 text-slate-600 text-sm">
-            <i class='bx bx-lock-alt'></i>
-        </div>
-        <div class="w-14 h-14 rounded-2xl bg-slate-850 border border-slate-800/40 flex items-center justify-center text-slate-500 mb-3 group-hover:scale-105 transition-all">
-            <i class='bx bx-bullseye text-3xl'></i>
-        </div>
-        <span class="text-sm font-bold text-slate-400 block">Menembak</span>
-        <span class="text-[9px] text-slate-500 mt-1.5 font-medium block">Segera Hadir</span>
-    </button>
-
-    <!-- Sport: Basket (Coming Soon) -->
-    <button onclick="showComingSoon('Bola Basket')" class="group bg-slate-800/20 border border-slate-800/60 p-4 rounded-3xl flex flex-col items-center justify-center text-center transition-all duration-300 transform active:scale-95 min-h-[140px] relative overflow-hidden select-none">
-        <div class="absolute right-3 top-3 text-slate-600 text-sm">
-            <i class='bx bx-lock-alt'></i>
-        </div>
-        <div class="w-14 h-14 rounded-2xl bg-slate-850 border border-slate-800/40 flex items-center justify-center text-slate-500 mb-3 group-hover:scale-105 transition-all">
-            <i class='bx bx-basketball text-3xl'></i>
-        </div>
-        <span class="text-sm font-bold text-slate-400 block">Bola Basket</span>
-        <span class="text-[9px] text-slate-500 mt-1.5 font-medium block">Segera Hadir</span>
-    </button>
-
-    <!-- Sport: Bulu Tangkis (Coming Soon) -->
-    <button onclick="showComingSoon('Bulu Tangkis')" class="group bg-slate-800/20 border border-slate-800/60 p-4 rounded-3xl flex flex-col items-center justify-center text-center transition-all duration-300 transform active:scale-95 min-h-[140px] relative overflow-hidden select-none">
-        <div class="absolute right-3 top-3 text-slate-600 text-sm">
-            <i class='bx bx-lock-alt'></i>
-        </div>
-        <div class="w-14 h-14 rounded-2xl bg-slate-850 border border-slate-800/40 flex items-center justify-center text-slate-500 mb-3 group-hover:scale-105 transition-all">
-            <i class='bx bx-tennis-ball text-3xl'></i>
-        </div>
-        <span class="text-sm font-bold text-slate-400 block">Bulu Tangkis</span>
-        <span class="text-[9px] text-slate-500 mt-1.5 font-medium block">Segera Hadir</span>
-    </button>
-
-    <!-- Sport: Bowling (Coming Soon) -->
-    <button onclick="showComingSoon('Bowling')" class="group bg-slate-800/20 border border-slate-800/60 p-4 rounded-3xl flex flex-col items-center justify-center text-center transition-all duration-300 transform active:scale-95 min-h-[140px] relative overflow-hidden select-none">
-        <div class="absolute right-3 top-3 text-slate-600 text-sm">
-            <i class='bx bx-lock-alt'></i>
-        </div>
-        <div class="w-14 h-14 rounded-2xl bg-slate-850 border border-slate-800/40 flex items-center justify-center text-slate-500 mb-3 group-hover:scale-105 transition-all">
-            <i class='bx bx-bowling-ball text-3xl'></i>
-        </div>
-        <span class="text-sm font-bold text-slate-400 block">Bowling</span>
-        <span class="text-[9px] text-slate-500 mt-1.5 font-medium block">Segera Hadir</span>
-    </button>
-
-    <!-- Sport: Panjat Tebing (Coming Soon) -->
-    <button onclick="showComingSoon('Panjat Tebing')" class="group bg-slate-800/20 border border-slate-800/60 p-4 rounded-3xl flex flex-col items-center justify-center text-center transition-all duration-300 transform active:scale-95 min-h-[140px] relative overflow-hidden select-none">
-        <div class="absolute right-3 top-3 text-slate-600 text-sm">
-            <i class='bx bx-lock-alt'></i>
-        </div>
-        <div class="w-14 h-14 rounded-2xl bg-slate-850 border border-slate-800/40 flex items-center justify-center text-slate-500 mb-3 group-hover:scale-105 transition-all">
-            <i class='bx bx-landscape text-3xl'></i>
-        </div>
-        <span class="text-sm font-bold text-slate-400 block">Panjat Tebing</span>
-        <span class="text-[9px] text-slate-500 mt-1.5 font-medium block">Segera Hadir</span>
-    </button>
+    <?php endforeach; ?>
 
 </div>
 
-<script>
-    function showComingSoon(sportName) {
-        Swal.fire({
-            title: sportName,
-            text: `Modul scoring untuk ${sportName} sedang dalam tahap pengembangan dan akan segera tersedia pada pembaruan aplikasi berikutnya.`,
-            icon: 'info',
-            background: '#1e293b',
-            color: '#f8fafc',
-            confirmButtonColor: '#8b5cf6',
-            confirmButtonText: 'Siap, Ditunggu!'
-        });
-    }
-</script>
+<style>
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
 
 <?= $this->endSection() ?>

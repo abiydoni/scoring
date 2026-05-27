@@ -14,12 +14,18 @@ class Anggota extends BaseController
     }
 
     // List athletes
-    public function index(): string
+    public function index()
     {
+        $activeCabor = session()->get('active_cabor');
+        if (!$activeCabor) {
+            return redirect()->to('/sports');
+        }
+
         $data = [
-            'title'       => 'Daftar Atlet',
+            'title'       => 'Daftar Atlet ' . $activeCabor,
             'active_menu' => 'anggota',
-            'anggota'     => $this->anggotaModel->orderBy('nama', 'ASC')->findAll(),
+            'activeCabor' => $activeCabor,
+            'anggota'     => $this->anggotaModel->where('cabor', $activeCabor)->orderBy('nama', 'ASC')->findAll(),
         ];
 
         return view('anggota/index', $data);
@@ -37,6 +43,7 @@ class Anggota extends BaseController
         }
 
         $this->anggotaModel->save([
+            'cabor'         => session()->get('active_cabor') ?: 'Panahan',
             'nama'          => $this->request->getPost('nama'),
             'telepon'       => $this->request->getPost('telepon'),
             'email'         => $this->request->getPost('email'),
@@ -61,6 +68,7 @@ class Anggota extends BaseController
         }
 
         $this->anggotaModel->update($id, [
+            'cabor'         => session()->get('active_cabor') ?: 'Panahan',
             'nama'          => $this->request->getPost('nama'),
             'telepon'       => $this->request->getPost('telepon'),
             'email'         => $this->request->getPost('email'),

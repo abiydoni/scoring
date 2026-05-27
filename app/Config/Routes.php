@@ -5,6 +5,7 @@ use CodeIgniter\Router\RouteCollection;
 /** @var RouteCollection $routes */
 $routes->get('/', 'Home::index');
 $routes->get('/sports', 'Sports::index');
+$routes->get('/sports/select/(:any)', 'Sports::select/$1');
 
 $routes->get('/anggota', 'Anggota::index');
 $routes->post('/anggota/store', 'Anggota::store');
