@@ -57,6 +57,8 @@
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Google Identity Services (One Tap) -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <!-- Immediately check and apply the saved theme before HTML parses to prevent theme flashes -->
     <script>
         // Ensure a theme is set; default to light mode
@@ -748,7 +750,8 @@
             const links = document.querySelectorAll('a');
             links.forEach(link => {
                 const href = link.getAttribute('href');
-                if (href && !href.startsWith('javascript') && !href.startsWith('#') && !link.hasAttribute('onclick') && !link.hasAttribute('download')) {
+                const isExternal = link.origin && link.origin !== window.location.origin;
+                if (href && !href.startsWith('javascript') && !href.startsWith('#') && !link.hasAttribute('onclick') && !link.hasAttribute('download') && link.getAttribute('target') !== '_blank' && !isExternal) {
                     // Mark as bound to avoid duplicate binding if re-run
                     if (!link.hasAttribute('data-pjax-bound')) {
                         link.setAttribute('data-pjax-bound', 'true');
@@ -885,9 +888,142 @@
             }
         }
 
+        let deferredPrompt;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent the mini-infobar from appearing on mobile
+            e.preventDefault();
+            // Stash the event so it can be triggered later.
+            deferredPrompt = e;
+        });
+
+        function showAppInstallPrompt() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    deferredPrompt = null;
+                });
+            }
+        }
+
+        function recordUserOnline(email) {
+            fetch('/user/record-online', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: new URLSearchParams({ email: email })
+            }).catch(e => console.error('Error recording online status:', e));
+        }
+
+        function decodeJwtResponse(token) {
+            let base64Url = token.split('.')[1];
+            let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            let jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            return JSON.parse(jsonPayload);
+        }
+
+        function handleGoogleCredentialResponse(response) {
+            try {
+                const responsePayload = decodeJwtResponse(response.credential);
+                const userEmail = responsePayload.email;
+                const userName = responsePayload.name;
+                
+                if (userEmail) {
+                    localStorage.setItem('app_user_email', userEmail);
+                    recordUserOnline(userEmail);
+                    
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: `Selamat datang, ${userName}!`,
+                        showConfirmButton: false,
+                        timer: 2500,
+                        background: document.documentElement.classList.contains('light-mode') ? '#ffffff' : '#1e293b',
+                        color: document.documentElement.classList.contains('light-mode') ? '#0f172a' : '#f8fafc',
+                    });
+
+                    // Show PWA install prompt after a short delay
+                    setTimeout(showAppInstallPrompt, 1500);
+                }
+            } catch (e) {
+                console.error("Error decoding Google credential", e);
+            }
+        }
+
+        function showManualEmailLogin() {
+            Swal.fire({
+                title: 'Login Diperlukan',
+                text: 'Silakan ketik email Google Anda untuk menggunakan aplikasi ini.',
+                input: 'email',
+                inputPlaceholder: 'email@gmail.com',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                showCancelButton: false,
+                confirmButtonText: 'Mulai',
+                confirmButtonColor: '#8b5cf6',
+                background: document.documentElement.classList.contains('light-mode') ? '#ffffff' : '#1e293b',
+                color: document.documentElement.classList.contains('light-mode') ? '#0f172a' : '#f8fafc',
+                inputValidator: (value) => {
+                    if (!value) return 'Email wajib diisi!';
+                    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!regex.test(value)) return 'Format email tidak valid!';
+                }
+            }).then((result) => {
+                if (result.isConfirmed && result.value) {
+                    localStorage.setItem('app_user_email', result.value);
+                    recordUserOnline(result.value);
+                    
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Email berhasil disimpan',
+                        showConfirmButton: false,
+                        timer: 2000,
+                        background: document.documentElement.classList.contains('light-mode') ? '#ffffff' : '#1e293b',
+                        color: document.documentElement.classList.contains('light-mode') ? '#0f172a' : '#f8fafc',
+                    });
+
+                    setTimeout(showAppInstallPrompt, 1500);
+                }
+            });
+        }
+
+        function checkUserEmail() {
+            let email = localStorage.getItem('app_user_email');
+            if (!email) {
+                const initGoogle = () => {
+                    if (typeof google !== 'undefined' && google.accounts && google.accounts.id) {
+                        google.accounts.id.initialize({
+                            client_id: '215408546614-3et2rjsrmlm1pbt1q9m9emb4rv0l5g9j.apps.googleusercontent.com',
+                            callback: handleGoogleCredentialResponse,
+                            cancel_on_tap_outside: false
+                        });
+                        google.accounts.id.prompt((notification) => {
+                            if (notification.isNotDisplayed() || notification.isSkippedMoment() || notification.isDismissedMoment()) {
+                                console.log('OneTap closed or failed, showing manual login');
+                                showManualEmailLogin();
+                            }
+                        });
+                    } else {
+                        setTimeout(initGoogle, 100);
+                    }
+                };
+                initGoogle();
+            } else {
+                recordUserOnline(email);
+            }
+        }
+
         // Update theme icon on DOMContentLoaded and theme toggles
         document.addEventListener('DOMContentLoaded', function() {
             updateThemeIcon();
+            checkUserEmail();
         });
 
         function updateThemeIcon() {

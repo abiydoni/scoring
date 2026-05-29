@@ -29,3 +29,7 @@ $routes->group('bulutangkis', function($routes) {
     $routes->post('finish_game', 'Bulutangkis::finish_game');
     $routes->post('finish_match', 'Bulutangkis::finish_match');
 });
+
+// User Tracking & Admin
+$routes->post('/user/record-online', 'UserTracking::record_online');
+$routes->get('/users', 'UserTracking::index');
