@@ -62,15 +62,34 @@
         <div class="flex-1 flex px-4 gap-3 pb-8">
             <!-- Player A (Atlet) -->
             <div class="flex-1 flex flex-col">
-                <div class="bg-slate-900 border border-slate-800 rounded-t-3xl py-3 px-2 text-center shadow-inner">
+                <div class="bg-slate-900 border border-slate-800 rounded-t-3xl py-2 px-2 text-center shadow-inner">
+                    <div class="flex justify-center mb-1.5 gap-1">
+                        <?php if (!empty($atlet['foto'])): ?>
+                            <img src="/uploads/anggota/<?= esc($atlet['foto']) ?>" onclick="showImageModal('/uploads/anggota/<?= esc($atlet['foto']) ?>')" class="w-8 h-8 rounded-full object-cover border border-emerald-500/20 shadow-sm cursor-pointer hover:scale-105 transition-transform shrink-0">
+                        <?php else: ?>
+                            <div class="w-8 h-8 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold text-xs shrink-0">
+                                <?= strtoupper(substr($atlet['nama'], 0, 2)) ?>
+                            </div>
+                        <?php endif; ?>
+                        
+                        <?php if ($match['tipe_match'] === 'Ganda' && !empty($partner)): ?>
+                            <?php if (!empty($partner['foto'])): ?>
+                                <img src="/uploads/anggota/<?= esc($partner['foto']) ?>" onclick="showImageModal('/uploads/anggota/<?= esc($partner['foto']) ?>')" class="w-8 h-8 rounded-full object-cover border border-emerald-500/20 shadow-sm cursor-pointer hover:scale-105 transition-transform shrink-0">
+                            <?php else: ?>
+                                <div class="w-8 h-8 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold text-xs shrink-0">
+                                    <?= strtoupper(substr($partner['nama'], 0, 2)) ?>
+                                </div>
+                            <?php endif; ?>
+                        <?php endif; ?>
+                    </div>
                     <?php 
                         $timKita = esc($atlet['nama']);
                         if ($match['tipe_match'] === 'Ganda' && !empty($partner)) {
                             $timKita .= ' & ' . esc($partner['nama']);
                         }
                     ?>
-                    <h3 class="text-sm font-bold text-white truncate px-1" title="<?= $timKita ?>"><?= $timKita ?></h3>
-                    <span class="text-[10px] text-emerald-400 font-semibold uppercase">Tim Kita</span>
+                    <h3 class="text-xs font-bold text-white truncate px-1" title="<?= $timKita ?>"><?= $timKita ?></h3>
+                    <span class="text-[9px] text-emerald-400 font-semibold uppercase">Tim Kita</span>
                 </div>
                 
                 <!-- Big Touch Area -->
@@ -92,17 +111,35 @@
 
             <!-- Player B (Lawan) -->
             <div class="flex-1 flex flex-col">
-                <div class="bg-slate-900 border border-slate-800 rounded-t-3xl py-3 px-2 text-center shadow-inner">
-                    <?php 
-                        $timLawan = $match['lawan_nama'] ? esc($match['lawan_nama']) : 'Lawan Anonim';
-                        if ($match['tipe_match'] === 'Ganda' && !empty($match['lawan_partner_nama'])) {
-                            $timLawan .= ' & ' . esc($match['lawan_partner_nama']);
-                        }
-                    ?>
-                    <h3 class="text-sm font-bold text-white truncate px-1" title="<?= $timLawan ?>">
+                <div class="bg-slate-900 border border-slate-800 rounded-t-3xl py-2 px-2 text-center shadow-inner">
+                    <div class="flex justify-center mb-1.5 gap-1">
+                        <?php 
+                            $timLawan = $match['lawan_nama'] ? esc($match['lawan_nama']) : 'Lawan Anonim';
+                        ?>
+                        <?php if (!empty($lawan['foto'])): ?>
+                            <img src="/uploads/anggota/<?= esc($lawan['foto']) ?>" onclick="showImageModal('/uploads/anggota/<?= esc($lawan['foto']) ?>')" class="w-8 h-8 rounded-full object-cover border border-rose-500/20 shadow-sm cursor-pointer hover:scale-105 transition-transform shrink-0">
+                        <?php else: ?>
+                            <div class="w-8 h-8 rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 font-bold text-xs shrink-0">
+                                <?= strtoupper(substr($timLawan, 0, 2)) ?>
+                            </div>
+                        <?php endif; ?>
+
+                        <?php if ($match['tipe_match'] === 'Ganda' && !empty($match['lawan_partner_nama'])): ?>
+                            <?php if (!empty($lawan_partner['foto'])): ?>
+                                <img src="/uploads/anggota/<?= esc($lawan_partner['foto']) ?>" onclick="showImageModal('/uploads/anggota/<?= esc($lawan_partner['foto']) ?>')" class="w-8 h-8 rounded-full object-cover border border-rose-500/20 shadow-sm cursor-pointer hover:scale-105 transition-transform shrink-0">
+                            <?php else: ?>
+                                <div class="w-8 h-8 rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 font-bold text-xs shrink-0">
+                                    <?= strtoupper(substr($match['lawan_partner_nama'], 0, 2)) ?>
+                                </div>
+                            <?php endif; ?>
+                            <?php $timLawan .= ' & ' . esc($match['lawan_partner_nama']); ?>
+                        <?php endif; ?>
+                    </div>
+                    
+                    <h3 class="text-xs font-bold text-white truncate px-1" title="<?= $timLawan ?>">
                         <?= $timLawan ?>
                     </h3>
-                    <span class="text-[10px] text-rose-400 font-semibold uppercase">Lawan</span>
+                    <span class="text-[9px] text-rose-400 font-semibold uppercase">Lawan</span>
                 </div>
                 
                 <!-- Big Touch Area -->

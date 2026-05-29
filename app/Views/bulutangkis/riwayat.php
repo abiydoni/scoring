@@ -5,9 +5,18 @@
 <!-- Header Profile -->
 <div class="mb-6 flex items-center justify-between">
     <div class="flex items-center gap-3">
-        <a href="/bulutangkis" class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700 transition-colors">
+        <a href="/bulutangkis" class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700 transition-colors shrink-0">
             <i class='bx bx-arrow-back'></i>
         </a>
+        
+        <?php if (!empty($atlet['foto'])): ?>
+            <img src="/uploads/anggota/<?= esc($atlet['foto']) ?>" onclick="showImageModal('/uploads/anggota/<?= esc($atlet['foto']) ?>')" class="w-10 h-10 rounded-2xl object-cover border border-emerald-500/20 shadow-sm shrink-0 cursor-pointer hover:scale-105 transition-transform">
+        <?php else: ?>
+            <div class="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold text-sm shrink-0 shadow-sm">
+                <?= strtoupper(substr($atlet['nama'], 0, 2)) ?>
+            </div>
+        <?php endif; ?>
+
         <div>
             <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest block mb-0.5">Riwayat Bulutangkis</span>
             <h2 class="text-xl font-bold text-white"><?= esc($atlet['nama']) ?></h2>

@@ -5,9 +5,13 @@
 <!-- Athlete Info card -->
 <div class="mb-5 bg-slate-800/20 border border-slate-800 p-4 rounded-3xl flex items-center justify-between select-none">
     <div class="flex items-center gap-3">
-        <div class="w-12 h-12 rounded-2xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-400 font-extrabold text-lg shrink-0 shadow shadow-brand-500/5">
-            <?= strtoupper(substr($anggota['nama'], 0, 2)) ?>
-        </div>
+        <?php if (!empty($anggota['foto'])): ?>
+            <img src="/uploads/anggota/<?= esc($anggota['foto']) ?>" onclick="showImageModal('/uploads/anggota/<?= esc($anggota['foto']) ?>')" class="w-12 h-12 rounded-2xl object-cover border border-brand-500/20 shadow-sm shrink-0 cursor-pointer hover:scale-105 transition-transform">
+        <?php else: ?>
+            <div class="w-12 h-12 rounded-2xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-400 font-extrabold text-lg shrink-0 shadow shadow-brand-500/5">
+                <?= strtoupper(substr($anggota['nama'], 0, 2)) ?>
+            </div>
+        <?php endif; ?>
         <div>
             <h3 class="text-sm font-bold text-white"><?= esc($anggota['nama']) ?></h3>
             <span class="text-[9px] text-slate-500 font-semibold uppercase block tracking-wider mt-0.5">Daftar Game Panahan</span>

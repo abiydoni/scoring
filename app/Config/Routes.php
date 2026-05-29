@@ -14,6 +14,7 @@ $routes->get('/anggota/delete/(:num)', 'Anggota::delete/$1');
 
 $routes->get('/panahan', 'Panahan::index');
 $routes->get('/panahan/anggota/(:num)', 'Panahan::anggota/$1');
+$routes->get('/panahan/ajaxStatistik/(:num)', 'Panahan::ajaxStatistik/$1');
 $routes->post('/panahan/create', 'Panahan::create');
 $routes->get('/panahan/game/(:num)', 'Panahan::game/$1');
 $routes->get('/panahan/game/(:num)/sesi/(:num)', 'Panahan::sesi/$1/$2');
@@ -23,6 +24,7 @@ $routes->post('/panahan/game/(:num)/shoot', 'Panahan::saveShoot/$1');
 $routes->group('bulutangkis', function($routes) {
     $routes->get('/', 'Bulutangkis::index');
     $routes->get('riwayat/(:num)', 'Bulutangkis::riwayat/$1');
+    $routes->get('ajaxStatistik/(:num)', 'Bulutangkis::ajaxStatistik/$1');
     $routes->post('create', 'Bulutangkis::create');
     $routes->get('scoring/(:num)', 'Bulutangkis::scoring/$1');
     $routes->post('update_score', 'Bulutangkis::update_score');

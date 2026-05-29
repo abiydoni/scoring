@@ -34,14 +34,14 @@
             <div class="athlete-card bg-slate-800/30 border border-slate-800/80 p-4 rounded-3xl hover:border-slate-700 transition-all flex items-center justify-between group" data-name="<?= esc(strtolower($person['nama'])) ?>">
                 <div class="flex items-center gap-3">
                     <?php if (!empty($person['foto'])): ?>
-                        <img src="/uploads/anggota/<?= esc($person['foto']) ?>" class="w-10 h-10 rounded-2xl object-cover border border-emerald-500/20 shadow-sm shrink-0">
+                        <img src="/uploads/anggota/<?= esc($person['foto']) ?>" onclick="showImageModal('/uploads/anggota/<?= esc($person['foto']) ?>')" class="w-10 h-10 rounded-2xl object-cover border border-emerald-500/20 shadow-sm shrink-0 cursor-pointer hover:scale-105 transition-transform">
                     <?php else: ?>
                         <div class="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold text-sm shrink-0 shadow-sm">
                             <?= strtoupper(substr($person['nama'], 0, 2)) ?>
                         </div>
                     <?php endif; ?>
-                    <div>
-                        <h4 class="text-sm font-bold text-white"><?= esc($person['nama']) ?></h4>
+                    <div onclick="showAthleteStats(event, <?= $person['id'] ?>, 'bulutangkis')" class="cursor-pointer group-hover:opacity-80 transition-opacity">
+                        <h4 class="text-sm font-bold text-white hover:text-emerald-400 transition-colors"><?= esc($person['nama']) ?></h4>
                         <span class="text-[9px] text-slate-500 font-semibold block mt-0.5 uppercase tracking-wide">Badminton Athlete</span>
                     </div>
                 </div>

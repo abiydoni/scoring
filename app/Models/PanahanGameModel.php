@@ -38,7 +38,7 @@ class PanahanGameModel extends Model
     // Custom method to get game details with athlete & opponent info
     public function getGameWithAthlete($id = null)
     {
-        $selectStr = 'panahan_game.*, anggota.nama as nama_anggota, lawan.nama as nama_lawan_db';
+        $selectStr = 'panahan_game.*, anggota.nama as nama_anggota, anggota.foto as foto_anggota, lawan.nama as nama_lawan_db, lawan.foto as foto_lawan_db';
         
         $builder = $this->select($selectStr)
                         ->join('anggota', 'anggota.id = panahan_game.anggota_id')
@@ -57,7 +57,7 @@ class PanahanGameModel extends Model
     // Get games by athlete
     public function getGamesByAthlete($athleteId)
     {
-        return $this->select('panahan_game.*, anggota.nama as nama_anggota, lawan.nama as nama_lawan_db')
+        return $this->select('panahan_game.*, anggota.nama as nama_anggota, anggota.foto as foto_anggota, lawan.nama as nama_lawan_db, lawan.foto as foto_lawan_db')
                     ->join('anggota', 'anggota.id = panahan_game.anggota_id')
                     ->join('anggota as lawan', 'lawan.id = panahan_game.lawan_id', 'left')
                     ->where('anggota_id', $athleteId)

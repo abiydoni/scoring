@@ -191,45 +191,7 @@
     <?php endif; ?>
 </div>
 
-<!-- Image Zoom Modal -->
-<div id="image-modal" class="fixed inset-0 z-[60] hidden flex items-center justify-center bg-black/80 backdrop-blur-md transition-opacity opacity-0" onclick="closeImageModal()">
-    <div class="relative max-w-full max-h-full p-4 flex flex-col items-center justify-center">
-        <button onclick="closeImageModal()" class="absolute top-2 right-2 md:top-6 md:right-6 w-10 h-10 bg-slate-800/80 hover:bg-rose-600 text-white rounded-full flex items-center justify-center transition-all z-10 shadow-lg">
-            <i class='bx bx-x text-2xl'></i>
-        </button>
-        <img id="image-modal-img" src="" class="max-w-[90vw] max-h-[85vh] rounded-2xl shadow-2xl object-contain transform scale-95 transition-transform duration-300">
-    </div>
-</div>
-
 <script>
-    function showImageModal(src) {
-        const modal = document.getElementById('image-modal');
-        const img = document.getElementById('image-modal-img');
-        img.src = src;
-        modal.classList.remove('hidden');
-        
-        // Trigger reflow and transition
-        setTimeout(() => {
-            modal.classList.remove('opacity-0');
-            img.classList.remove('scale-95');
-            img.classList.add('scale-100');
-        }, 10);
-    }
-
-    function closeImageModal() {
-        const modal = document.getElementById('image-modal');
-        const img = document.getElementById('image-modal-img');
-        
-        modal.classList.add('opacity-0');
-        img.classList.remove('scale-100');
-        img.classList.add('scale-95');
-        
-        setTimeout(() => {
-            modal.classList.add('hidden');
-            img.src = '';
-        }, 300);
-    }
-
     function openAthleteModal(mode, data = {}) {
         const modal = document.getElementById('athlete-form-modal');
         const title = document.getElementById('form-modal-title');

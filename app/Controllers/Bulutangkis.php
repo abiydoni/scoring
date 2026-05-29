@@ -166,6 +166,16 @@ class Bulutangkis extends BaseController
             $partner = $this->anggotaModel->find($match['partner_id']);
         }
         
+        $lawan = null;
+        if (!empty($match['lawan_id'])) {
+            $lawan = $this->anggotaModel->find($match['lawan_id']);
+        }
+
+        $lawan_partner = null;
+        if (!empty($match['lawan_partner_id'])) {
+            $lawan_partner = $this->anggotaModel->find($match['lawan_partner_id']);
+        }
+
         // Ambil game yang belum selesai, atau game terakhir jika semua selesai
         $currentGame = $this->gameModel->where('match_id', $match_id)->where('is_finished', false)->orderBy('set_ke', 'DESC')->first();
         if (!$currentGame) {
@@ -180,6 +190,8 @@ class Bulutangkis extends BaseController
             'match' => $match,
             'atlet' => $atlet,
             'partner' => $partner,
+            'lawan' => $lawan,
+            'lawan_partner' => $lawan_partner,
             'currentGame' => $currentGame,
             'allGames' => $allGames,
             // Sembunyikan navigasi bawah agar layar luas untuk scoring
@@ -279,5 +291,55 @@ class Bulutangkis extends BaseController
         }
 
         return $this->response->setJSON(['success' => true]);
+    }
+
+    // 7. GET AJAX: Statistik Atlet
+    public function ajaxStatistik($id)
+    {
+        $atlet = $this->anggotaModel->find($id);
+        if (!$atlet) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Atlet tidak ditemukan']);
+        }
+
+        $matches = $this->matchModel->where('anggota_id', $id)->findAll();
+        
+        $totalMatches = count($matches);
+        $matchWins = 0;
+        
+        $totalSets = 0;
+        $setWins = 0;
+        
+        $totalPoints = 0;
+        $totalGamesPlayed = 0;
+
+        foreach ($matches as $m) {
+            if ($m['set_menang_atlet'] > $m['set_menang_lawan']) {
+                $matchWins++;
+            }
+            $totalSets += ($m['set_menang_atlet'] + $m['set_menang_lawan']);
+            $setWins += $m['set_menang_atlet'];
+            
+            // fetch games for points
+            $games = $this->gameModel->where('match_id', $m['id'])->where('is_finished', true)->findAll();
+            foreach ($games as $g) {
+                $totalPoints += $g['poin_atlet'];
+                $totalGamesPlayed++;
+            }
+        }
+        
+        $winRate = $totalMatches > 0 ? round(($matchWins / $totalMatches) * 100) : 0;
+        $setRate = $totalSets > 0 ? round(($setWins / $totalSets) * 100) : 0;
+        $avgPoints = $totalGamesPlayed > 0 ? round($totalPoints / $totalGamesPlayed) : 0;
+
+        return $this->response->setJSON([
+            'success' => true, 
+            'atlet' => $atlet,
+            'stats' => [
+                [ 'label' => 'Total Match', 'value' => $totalMatches, 'color' => 'indigo' ],
+                [ 'label' => 'Win Rate Match', 'value' => $winRate . '%', 'color' => 'emerald' ],
+                [ 'label' => 'Rasio Menang Set', 'value' => $setRate . '%', 'color' => 'amber' ],
+                [ 'label' => 'Avg Poin/Set', 'value' => $avgPoints, 'color' => 'rose' ]
+            ]
+        ]);
     }
 }

@@ -436,4 +436,70 @@ class Panahan extends BaseController
             'message' => 'Scoring shoot ' . $shootNumber . ' berhasil disimpan!',
         ]);
     }
+
+    // 7. GET AJAX: Statistik Atlet
+    public function ajaxStatistik($id)
+    {
+        $atlet = $this->anggotaModel->find($id);
+        if (!$atlet) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Atlet tidak ditemukan']);
+        }
+
+        $games = $this->gameModel->where('anggota_id', $id)->findAll();
+        
+        $totalLatihan = count($games);
+        $kualifikasiGames = array_filter($games, fn($g) => $g['tipe_game'] === 'kualifikasi');
+        $aduanGames = array_filter($games, fn($g) => $g['tipe_game'] === 'aduan' || $g['tipe_game'] === 'mixteam');
+        
+        $pb = 0;
+        $totalKualifikasiScore = 0;
+        foreach ($kualifikasiGames as $g) {
+            if ($g['total_score'] > $pb) $pb = $g['total_score'];
+            $totalKualifikasiScore += $g['total_score'];
+        }
+        $avgScore = count($kualifikasiGames) > 0 ? round($totalKualifikasiScore / count($kualifikasiGames)) : 0;
+        
+        $aduanWins = 0;
+        foreach ($aduanGames as $g) {
+            if ($g['divisi'] === 'compound' || $g['divisi'] === 'barebow') {
+                if ($g['total_score'] > $g['total_score_lawan']) $aduanWins++;
+            } else {
+                if ($g['set_point_atlet'] > $g['set_point_lawan']) $aduanWins++;
+            }
+        }
+        $winRate = count($aduanGames) > 0 ? round(($aduanWins / count($aduanGames)) * 100) : 0;
+
+        // Calculate Shot Distribution
+        $shotStats = [
+            'X' => 0, '10' => 0, '9' => 0, '8' => 0, '7' => 0, 
+            '6' => 0, '5' => 0, '4' => 0, '3' => 0, '2' => 0, '1' => 0, 'M' => 0
+        ];
+        
+        if (!empty($games)) {
+            $gameIds = array_column($games, 'id');
+            $shotModel = new \App\Models\PanahanShotModel();
+            $shots = $shotModel->whereIn('game_id', $gameIds)->where('is_lawan', 0)->findAll();
+            
+            foreach ($shots as $shot) {
+                $val = strtoupper(trim((string)$shot['display_value']));
+                if ($val === 'M' || $val === '0' || (is_numeric($val) && $val == 0 && $val !== '-')) {
+                    $shotStats['M']++;
+                } else if (array_key_exists($val, $shotStats)) {
+                    $shotStats[$val]++;
+                }
+            }
+        }
+
+        return $this->response->setJSON([
+            'success' => true, 
+            'atlet' => $atlet,
+            'stats' => [
+                [ 'label' => 'Total Latihan', 'value' => $totalLatihan, 'color' => 'indigo' ],
+                [ 'label' => 'Personal Best', 'value' => $pb, 'color' => 'emerald' ],
+                [ 'label' => 'Rata-rata Skor', 'value' => $avgScore, 'color' => 'amber' ],
+                [ 'label' => 'Win Rate Duel', 'value' => $winRate . '%', 'color' => 'rose' ]
+            ],
+            'shot_stats' => $shotStats
+        ]);
+    }
 }

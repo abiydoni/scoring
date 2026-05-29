@@ -134,9 +134,13 @@
             <div class="flex items-center justify-between gap-1 mt-2.5">
                 <!-- Main Athlete -->
                 <div class="flex-1 text-center max-w-[120px]">
-                    <div class="w-10 h-10 rounded-full bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-400 font-black text-sm mx-auto shadow shadow-brand-500/5">
-                        <?= strtoupper(substr($game['nama_anggota'], 0, 2)) ?>
-                    </div>
+                    <?php if (!empty($game['foto_anggota'])): ?>
+                        <img src="/uploads/anggota/<?= esc($game['foto_anggota']) ?>" onclick="showImageModal('/uploads/anggota/<?= esc($game['foto_anggota']) ?>')" class="w-10 h-10 rounded-full object-cover border border-brand-500/20 shadow-sm mx-auto cursor-pointer hover:scale-105 transition-transform">
+                    <?php else: ?>
+                        <div class="w-10 h-10 rounded-full bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-400 font-black text-sm mx-auto shadow shadow-brand-500/5">
+                            <?= strtoupper(substr($game['nama_anggota'], 0, 2)) ?>
+                        </div>
+                    <?php endif; ?>
                     <span class="text-xs font-bold game-title-text block mt-1.5 truncate"><?= esc(explode(' ', $game['nama_anggota'])[0]) ?></span>
                     <span class="text-[9px] text-slate-500 mt-0.5 block truncate">
                         <?= $game['divisi'] === 'compound' ? 'Compound' : 'Skor: ' . $game['total_score'] ?>
@@ -163,9 +167,13 @@
 
                 <!-- Opponent -->
                 <div class="flex-1 text-center max-w-[120px]">
-                    <div class="w-10 h-10 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 font-black text-sm mx-auto shadow shadow-amber-500/5">
-                        <?= strtoupper(substr($namaLawan, 0, 2)) ?>
-                    </div>
+                    <?php if ($game['lawan_id'] && !empty($game['foto_lawan_db'])): ?>
+                        <img src="/uploads/anggota/<?= esc($game['foto_lawan_db']) ?>" onclick="showImageModal('/uploads/anggota/<?= esc($game['foto_lawan_db']) ?>')" class="w-10 h-10 rounded-full object-cover border border-amber-500/20 shadow-sm mx-auto cursor-pointer hover:scale-105 transition-transform">
+                    <?php else: ?>
+                        <div class="w-10 h-10 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 font-black text-sm mx-auto shadow shadow-amber-500/5">
+                            <?= strtoupper(substr($namaLawan, 0, 2)) ?>
+                        </div>
+                    <?php endif; ?>
                     <span class="text-xs font-bold game-title-text block mt-1.5 truncate"><?= esc(explode(' ', $namaLawan)[0]) ?></span>
                     <span class="text-[9px] text-slate-500 mt-0.5 block truncate">
                         <?= $game['divisi'] === 'compound' ? 'Compound' : 'Skor: ' . $game['total_score_lawan'] ?>

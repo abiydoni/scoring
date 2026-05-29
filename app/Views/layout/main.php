@@ -618,6 +618,9 @@
                     </a>
                 <?php endif; ?>
                 <?php if (uri_string() == 'sports' || uri_string() == 'sports/'): ?>
+                    <button onclick="navigator.share ? navigator.share({title: 'Appsbee Scoring', url: window.location.href}) : alert('Fitur share tidak didukung di browser ini.')" title="Bagikan Aplikasi" class="w-8 h-8 rounded-full bg-slate-800/60 hover:bg-brand-600 flex items-center justify-center text-brand-400 hover:text-white transition-all">
+                        <i class='bx bx-share-alt text-lg'></i>
+                    </button>
                     <a href="/users" title="Pengguna Aktif" class="w-8 h-8 rounded-full bg-slate-800/60 hover:bg-slate-800 flex items-center justify-center text-emerald-400 hover:text-emerald-300 transition-all">
                         <i class='bx bx-user-check text-lg'></i>
                     </a>
@@ -1061,6 +1064,225 @@
             });
         }
     </script>
+
+<!-- Global Image Zoom Modal -->
+<div id="image-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/80 backdrop-blur-md transition-opacity opacity-0" onclick="closeImageModal()">
+    <div class="relative max-w-full max-h-full p-4 flex flex-col items-center justify-center">
+        <button onclick="closeImageModal()" class="absolute top-2 right-2 md:top-6 md:right-6 w-10 h-10 bg-slate-800/80 hover:bg-rose-600 text-white rounded-full flex items-center justify-center transition-all z-10 shadow-lg">
+            <i class='bx bx-x text-2xl'></i>
+        </button>
+        <img id="image-modal-img" src="" class="max-w-[90vw] max-h-[85vh] rounded-2xl shadow-2xl object-contain transform scale-95 transition-transform duration-300">
+    </div>
+</div>
+
+<script>
+    function showImageModal(src) {
+        const modal = document.getElementById('image-modal');
+        const img = document.getElementById('image-modal-img');
+        img.src = src;
+        modal.classList.remove('hidden');
+        
+        // Trigger reflow and transition
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            img.classList.remove('scale-95');
+            img.classList.add('scale-100');
+        }, 10);
+    }
+
+    function closeImageModal() {
+        const modal = document.getElementById('image-modal');
+        const img = document.getElementById('image-modal-img');
+        
+        modal.classList.add('opacity-0');
+        img.classList.remove('scale-100');
+        img.classList.add('scale-95');
+        
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            img.src = '';
+        }, 300);
+    }
+</script>
+
+<!-- Global Athlete Stats Modal -->
+<div id="athlete-stats-modal" class="fixed inset-0 z-[90] hidden flex items-center justify-center bg-black/60 backdrop-blur-md transition-opacity opacity-0" onclick="closeAthleteStats(event)">
+    <div class="bg-slate-900 border border-slate-700/50 rounded-[2rem] w-full max-w-sm mx-4 overflow-hidden shadow-2xl relative transform scale-95 transition-transform duration-300">
+        <!-- Close Button -->
+        <button onclick="closeAthleteStats()" class="absolute top-4 right-4 w-8 h-8 bg-slate-800/80 hover:bg-rose-600 text-white rounded-full flex items-center justify-center transition-all z-10 shadow-lg">
+            <i class='bx bx-x text-xl'></i>
+        </button>
+        
+        <!-- Header -->
+        <div class="px-6 pt-8 pb-6 bg-gradient-to-br from-slate-800/80 to-slate-900 text-center relative overflow-hidden border-b border-slate-800">
+            <div class="absolute -right-8 -top-8 w-32 h-32 bg-brand-500/10 rounded-full blur-2xl"></div>
+            
+            <div class="w-20 h-20 mx-auto rounded-full bg-slate-800 border-[3px] border-slate-700 flex items-center justify-center text-3xl font-black text-slate-300 shadow-xl overflow-hidden relative z-10" id="stats-avatar-container">
+                <!-- Avatar injected via JS -->
+            </div>
+            
+            <h3 class="text-xl font-black text-white mt-4 tracking-wide" id="stats-nama">Memuat...</h3>
+            <p class="text-xs text-brand-400 font-bold uppercase tracking-widest mt-1" id="stats-cabor">Cabor</p>
+            
+            <div class="flex items-center justify-center gap-2 mt-3 text-[10px] font-bold text-slate-400" id="stats-badges">
+                <!-- Badges injected via JS -->
+            </div>
+        </div>
+        
+        <!-- Stats Grid -->
+        <div class="p-5 bg-slate-950" id="stats-grid-container">
+            <!-- Loading State -->
+            <div class="flex justify-center py-8">
+                <i class='bx bx-loader-alt animate-spin text-4xl text-brand-500'></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showAthleteStats(event, id, cabor) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        
+        const modal = document.getElementById('athlete-stats-modal');
+        const gridContainer = document.getElementById('stats-grid-container');
+        const avatarContainer = document.getElementById('stats-avatar-container');
+        const namaEl = document.getElementById('stats-nama');
+        const caborEl = document.getElementById('stats-cabor');
+        const badgesEl = document.getElementById('stats-badges');
+        
+        // Reset state
+        gridContainer.innerHTML = `<div class="flex justify-center py-8"><i class='bx bx-loader-alt animate-spin text-4xl text-brand-500'></i></div>`;
+        avatarContainer.innerHTML = `<i class='bx bx-user text-slate-600'></i>`;
+        namaEl.textContent = 'Memuat Data...';
+        caborEl.textContent = cabor;
+        badgesEl.innerHTML = '';
+        
+        modal.classList.remove('hidden');
+        
+        // Trigger transition
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            modal.querySelector('.transform').classList.remove('scale-95');
+            modal.querySelector('.transform').classList.add('scale-100');
+        }, 10);
+        
+        // Fetch data
+        fetch(`/${cabor}/ajaxStatistik/${id}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const atlet = data.atlet;
+                    
+                    namaEl.textContent = atlet.nama;
+                    
+                    if (atlet.foto) {
+                        avatarContainer.innerHTML = `<img src="/uploads/anggota/${atlet.foto}" class="w-full h-full object-cover cursor-pointer" onclick="showImageModal('/uploads/anggota/${atlet.foto}')">`;
+                    } else {
+                        avatarContainer.innerHTML = `<span class="text-brand-400">${atlet.nama.substring(0,2).toUpperCase()}</span>`;
+                    }
+                    
+                    let badgesHtml = '';
+                    if (atlet.jenis_kelamin) {
+                        const icon = atlet.jenis_kelamin === 'L' ? 'bx-male text-sky-400' : 'bx-female text-pink-400';
+                        badgesHtml += `<span class="px-2 py-0.5 rounded-full bg-slate-800 border border-slate-700 flex items-center gap-1"><i class='bx ${icon} text-sm'></i> ${atlet.jenis_kelamin === 'L' ? 'Laki-Laki' : 'Perempuan'}</span>`;
+                    }
+                    if (atlet.klub) {
+                        badgesHtml += `<span class="px-2 py-0.5 rounded-full bg-slate-800 border border-slate-700 flex items-center gap-1"><i class='bx bx-building-house text-sm'></i> ${atlet.klub}</span>`;
+                    }
+                    badgesEl.innerHTML = badgesHtml;
+                    
+                    const colorMap = {
+                        'indigo': { bg: 'from-indigo-500/10 to-indigo-600/20', border: 'border-indigo-500/30', text: 'text-indigo-400' },
+                        'emerald': { bg: 'from-emerald-500/10 to-emerald-600/20', border: 'border-emerald-500/30', text: 'text-emerald-400' },
+                        'amber': { bg: 'from-amber-500/10 to-amber-600/20', border: 'border-amber-500/30', text: 'text-amber-400' },
+                        'rose': { bg: 'from-rose-500/10 to-rose-600/20', border: 'border-rose-500/30', text: 'text-rose-400' }
+                    };
+                    
+                    let gridHtml = '<div class="grid grid-cols-2 gap-3">';
+                    data.stats.forEach(stat => {
+                        const c = colorMap[stat.color] || colorMap['indigo'];
+                        gridHtml += `
+                            <div class="bg-gradient-to-br ${c.bg} border ${c.border} p-4 rounded-[1.25rem] text-center shadow-inner hover:scale-105 transition-transform cursor-default flex flex-col justify-center min-h-[90px]">
+                                <span class="text-[9px] font-bold ${c.text} uppercase tracking-widest block mb-1 leading-tight">${stat.label}</span>
+                                <span class="text-2xl font-black text-white drop-shadow-md leading-none">${stat.value}</span>
+                            </div>
+                        `;
+                    });
+                    
+                    if (data.shot_stats) {
+                        gridHtml += `
+                            <div class="col-span-2 mt-2 bg-slate-900 border border-slate-800 rounded-3xl shadow-inner overflow-hidden">
+                                <div class="bg-slate-800/50 py-2 border-b border-slate-700/50">
+                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block text-center">Distribusi Anak Panah</span>
+                                </div>
+                                <div class="overflow-x-auto no-scrollbar">
+                                    <table class="w-full text-center text-xs">
+                                        <thead>
+                                            <tr class="bg-slate-900 border-b border-slate-800">
+                                                <th class="py-2 px-1 font-black text-amber-500">X</th>
+                                                <th class="py-2 px-1 font-black text-amber-500">10</th>
+                                                <th class="py-2 px-1 font-black text-amber-500">9</th>
+                                                <th class="py-2 px-1 font-black text-rose-500">8</th>
+                                                <th class="py-2 px-1 font-black text-rose-500">7</th>
+                                                <th class="py-2 px-1 font-black text-sky-500">6</th>
+                                                <th class="py-2 px-1 font-black text-sky-500">5</th>
+                                                <th class="py-2 px-1 font-black text-slate-300">4</th>
+                                                <th class="py-2 px-1 font-black text-slate-300">3</th>
+                                                <th class="py-2 px-1 font-black text-slate-400">2</th>
+                                                <th class="py-2 px-1 font-black text-slate-400">1</th>
+                                                <th class="py-2 px-1 font-black text-slate-500">M</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="text-white font-bold bg-slate-950/50">
+                                                <td class="py-2 px-1">${data.shot_stats.X}</td>
+                                                <td class="py-2 px-1">${data.shot_stats['10']}</td>
+                                                <td class="py-2 px-1">${data.shot_stats['9']}</td>
+                                                <td class="py-2 px-1">${data.shot_stats['8']}</td>
+                                                <td class="py-2 px-1">${data.shot_stats['7']}</td>
+                                                <td class="py-2 px-1">${data.shot_stats['6']}</td>
+                                                <td class="py-2 px-1">${data.shot_stats['5']}</td>
+                                                <td class="py-2 px-1">${data.shot_stats['4']}</td>
+                                                <td class="py-2 px-1">${data.shot_stats['3']}</td>
+                                                <td class="py-2 px-1">${data.shot_stats['2']}</td>
+                                                <td class="py-2 px-1">${data.shot_stats['1']}</td>
+                                                <td class="py-2 px-1">${data.shot_stats.M}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    gridHtml += '</div>';
+                    
+                    gridContainer.innerHTML = gridHtml;
+                } else {
+                    gridContainer.innerHTML = `<div class="text-center py-6 text-rose-400 text-sm font-bold"><i class='bx bx-error-circle text-3xl block mb-2'></i>${data.message}</div>`;
+                }
+            })
+            .catch(err => {
+                gridContainer.innerHTML = `<div class="text-center py-6 text-rose-400 text-sm font-bold"><i class='bx bx-wifi-off text-3xl block mb-2'></i>Gagal mengambil data statistik.</div>`;
+            });
+    }
+
+    function closeAthleteStats(event) {
+        if (event && event.target.id !== 'athlete-stats-modal') return;
+        
+        const modal = document.getElementById('athlete-stats-modal');
+        modal.classList.add('opacity-0');
+        modal.querySelector('.transform').classList.remove('scale-100');
+        modal.querySelector('.transform').classList.add('scale-95');
+        
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 300);
+    }
+</script>
 
 </body>
 </html>
