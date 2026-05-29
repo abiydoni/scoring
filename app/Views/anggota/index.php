@@ -17,7 +17,7 @@
 <div id="athlete-form-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/40 backdrop-blur-sm">
     <div class="bg-slate-800/90 light-modal p-6 rounded-3xl max-w-md w-full mx-4">
         <h3 id="form-modal-title" class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-4">Tambah Atlet Baru</h3>
-        <form id="athlete-form" action="/anggota/store" method="POST">
+        <form id="athlete-form" action="/anggota/store" method="POST" enctype="multipart/form-data">
             <div class="space-y-3.5">
                 <div class="grid grid-cols-2 gap-3">
                     <div>
@@ -89,6 +89,10 @@
                         <input type="text" id="kota" name="kota" placeholder="Contoh: Jakarta" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-2xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-slate-100 placeholder-slate-600 text-xs transition-all outline-none" />
                     </div>
                 </div>
+                <div>
+                    <label for="foto" class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Foto Profil <span class="text-slate-500 text-[9px] normal-case font-normal">(Opsional)</span></label>
+                    <input type="file" id="foto" name="foto" accept="image/*" class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-2xl text-slate-400 text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-[10px] file:font-bold file:bg-brand-600 file:text-white hover:file:bg-brand-700 transition-all outline-none cursor-pointer" />
+                </div>
                 <div class="flex items-center gap-3 pt-2">
                     <button type="submit" class="flex-1 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-2xl font-bold text-xs transition-all shadow-md shadow-brand-600/10 active:scale-95 duration-200">
                         <i class='bx bx-save mr-1.5'></i>
@@ -105,6 +109,19 @@
 
 
 
+<!-- Search Box -->
+<div class="mb-4">
+    <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+            <i class='bx bx-search text-slate-400 text-lg'></i>
+        </div>
+        <input type="text" id="searchAthlete" onkeyup="filterAthletes()" class="w-full bg-slate-900/60 border border-slate-800 text-white text-sm rounded-2xl focus:ring-brand-500 focus:border-brand-500 block pl-10 pr-10 p-3.5 transition-all placeholder-slate-500 shadow-inner" placeholder="Ketik nama atlet untuk mencari...">
+        <div class="absolute inset-y-0 right-0 pr-3.5 flex items-center">
+            <i id="clearSearch" class='bx bx-x text-slate-400 text-2xl cursor-pointer hover:text-white hidden' onclick="clearSearchInput()"></i>
+        </div>
+    </div>
+</div>
+
 <!-- Athletes Cards List -->
 <div class="space-y-3">
     <?php if (empty($anggota)): ?>
@@ -114,12 +131,16 @@
         </div>
     <?php else: ?>
         <?php foreach ($anggota as $person): ?>
-            <div class="bg-slate-800/30 border border-slate-800/80 p-4 rounded-3xl hover:border-slate-700 transition-all flex flex-col justify-between relative overflow-hidden group">
+            <div class="athlete-card bg-slate-800/30 border border-slate-800/80 p-4 rounded-3xl hover:border-slate-700 transition-all flex flex-col justify-between relative overflow-hidden group" data-name="<?= esc(strtolower($person['nama'])) ?>">
                 <div class="flex justify-between items-start">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-2xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-400 font-black text-sm shrink-0 shadow-sm">
-                            <?= strtoupper(substr($person['nama'], 0, 2)) ?>
-                        </div>
+                        <?php if (!empty($person['foto'])): ?>
+                            <img src="/uploads/anggota/<?= esc($person['foto']) ?>" onclick="showImageModal('/uploads/anggota/<?= esc($person['foto']) ?>')" class="w-10 h-10 rounded-2xl object-cover border border-brand-500/20 shadow-sm cursor-pointer shrink-0 hover:scale-105 transition-transform">
+                        <?php else: ?>
+                            <div class="w-10 h-10 rounded-2xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-400 font-black text-sm shrink-0 shadow-sm">
+                                <?= strtoupper(substr($person['nama'], 0, 2)) ?>
+                            </div>
+                        <?php endif; ?>
                         <div>
                             <h4 class="text-sm font-bold text-white"><?= esc($person['nama']) ?></h4>
                             <div class="flex flex-wrap gap-x-3 gap-y-1 mt-1 text-[10px] text-slate-400 font-medium">
@@ -170,7 +191,45 @@
     <?php endif; ?>
 </div>
 
+<!-- Image Zoom Modal -->
+<div id="image-modal" class="fixed inset-0 z-[60] hidden flex items-center justify-center bg-black/80 backdrop-blur-md transition-opacity opacity-0" onclick="closeImageModal()">
+    <div class="relative max-w-full max-h-full p-4 flex flex-col items-center justify-center">
+        <button onclick="closeImageModal()" class="absolute top-2 right-2 md:top-6 md:right-6 w-10 h-10 bg-slate-800/80 hover:bg-rose-600 text-white rounded-full flex items-center justify-center transition-all z-10 shadow-lg">
+            <i class='bx bx-x text-2xl'></i>
+        </button>
+        <img id="image-modal-img" src="" class="max-w-[90vw] max-h-[85vh] rounded-2xl shadow-2xl object-contain transform scale-95 transition-transform duration-300">
+    </div>
+</div>
+
 <script>
+    function showImageModal(src) {
+        const modal = document.getElementById('image-modal');
+        const img = document.getElementById('image-modal-img');
+        img.src = src;
+        modal.classList.remove('hidden');
+        
+        // Trigger reflow and transition
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            img.classList.remove('scale-95');
+            img.classList.add('scale-100');
+        }, 10);
+    }
+
+    function closeImageModal() {
+        const modal = document.getElementById('image-modal');
+        const img = document.getElementById('image-modal-img');
+        
+        modal.classList.add('opacity-0');
+        img.classList.remove('scale-100');
+        img.classList.add('scale-95');
+        
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            img.src = '';
+        }, 300);
+    }
+
     function openAthleteModal(mode, data = {}) {
         const modal = document.getElementById('athlete-form-modal');
         const title = document.getElementById('form-modal-title');
@@ -237,6 +296,36 @@
                 window.location.href = `/anggota/delete/${id}`;
             }
         });
+    }
+
+    // Search Filter Logic
+    function filterAthletes() {
+        let input = document.getElementById('searchAthlete');
+        let filter = input.value.toLowerCase();
+        let athleteCards = document.querySelectorAll('.athlete-card');
+        let clearBtn = document.getElementById('clearSearch');
+        
+        if (filter.length > 0) {
+            clearBtn.classList.remove('hidden');
+        } else {
+            clearBtn.classList.add('hidden');
+        }
+        
+        athleteCards.forEach(card => {
+            let name = card.getAttribute('data-name');
+            if (name.includes(filter)) {
+                card.style.setProperty("display", "flex", "important");
+            } else {
+                card.style.setProperty("display", "none", "important");
+            }
+        });
+    }
+
+    function clearSearchInput() {
+        let input = document.getElementById('searchAthlete');
+        input.value = '';
+        filterAthletes();
+        input.focus();
     }
 </script>
 

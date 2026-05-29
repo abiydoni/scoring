@@ -30,6 +30,14 @@ class Home extends BaseController
         $latestGames = [];
         $chartLabels = [];
         $chartScores = [];
+        
+        // Extended defaults for Panahan
+        $avgScore = 0;
+        $winRate = ['menang' => 0, 'kalah' => 0, 'seri' => 0, 'total' => 0];
+        $arrowLabels = [];
+        $arrowData = [];
+        $topAthleteLabels = [];
+        $topAthleteData = [];
 
         // 2. Fetch Module-specific stats
         if (strtolower($activeCabor) === 'panahan') {
@@ -65,6 +73,59 @@ class Home extends BaseController
                 $chartLabels[] = explode(' ', $rg['nama_anggota'])[0] . ' (' . date('d/m', strtotime($rg['tanggal'])) . ')';
                 $chartScores[] = $rg['total_score'];
             }
+
+            // --- NEW PANAHAN STATS ---
+            // Rata-rata Skor per Game
+            $avgScoreRow = $gameModel->select('AVG(total_score) as avg_score')->first();
+            $avgScore = $avgScoreRow ? round($avgScoreRow['avg_score'], 1) : 0;
+
+            // Statistik Menang/Kalah/Seri
+            $matches = $gameModel->where('tipe_game', 'Tanding')->findAll();
+            $menang = 0; $kalah = 0; $seri = 0;
+            foreach ($matches as $m) {
+                if ($m['set_point_atlet'] > $m['set_point_lawan']) $menang++;
+                elseif ($m['set_point_atlet'] < $m['set_point_lawan']) $kalah++;
+                else $seri++;
+            }
+            $winRate = [
+                'menang' => $menang,
+                'kalah' => $kalah,
+                'seri' => $seri,
+                'total' => count($matches)
+            ];
+
+            // Distribusi Anak Panah
+            $arrowDist = $shotModel->select('display_value, COUNT(*) as count')
+                                   ->where('is_lawan', 0)
+                                   ->groupBy('display_value')
+                                   ->findAll();
+            
+            // Sort Arrow Distribution manually (X, 10, 9, ..., M)
+            $order = ['X' => 11, '10' => 10, '9' => 9, '8' => 8, '7' => 7, '6' => 6, '5' => 5, '4' => 4, '3' => 3, '2' => 2, '1' => 1, 'M' => 0];
+            usort($arrowDist, function($a, $b) use ($order) {
+                $valA = $order[$a['display_value']] ?? -1;
+                $valB = $order[$b['display_value']] ?? -1;
+                return $valB - $valA;
+            });
+
+            foreach ($arrowDist as $ad) {
+                $arrowLabels[] = $ad['display_value'];
+                $arrowData[] = $ad['count'];
+            }
+
+            // Top 5 Atlet berdasarkan rata-rata skor
+            $topAthletes = $gameModel->select('anggota.nama, AVG(panahan_game.total_score) as avg_score')
+                                     ->join('anggota', 'anggota.id = panahan_game.anggota_id')
+                                     ->groupBy('panahan_game.anggota_id')
+                                     ->orderBy('avg_score', 'DESC')
+                                     ->limit(5)
+                                     ->find();
+            
+            foreach ($topAthletes as $ta) {
+                $topAthleteLabels[] = explode(' ', $ta['nama'])[0];
+                $topAthleteData[] = round($ta['avg_score'], 1);
+            }
+
         } else if (strtolower($activeCabor) === 'bulutangkis') {
             $bmModel = new BulutangkisMatchModel();
             $bgModel = new BulutangkisGameModel();
@@ -88,7 +149,6 @@ class Home extends BaseController
 
             foreach ($recentMatches as $rm) {
                 $chartLabels[] = explode(' ', $rm['nama_anggota'])[0] . ' (' . date('d/m', strtotime($rm['tanggal'])) . ')';
-                // For bulutangkis, maybe chart score is win difference? Or just total sets won?
                 $chartScores[] = $rm['set_menang_atlet'];
             }
         }
@@ -105,6 +165,13 @@ class Home extends BaseController
             'latestGames'    => $latestGames,
             'chartLabels'    => json_encode($chartLabels),
             'chartScores'    => json_encode($chartScores),
+            // Extensions
+            'avgScore'         => $avgScore,
+            'winRate'          => $winRate,
+            'arrowLabels'      => json_encode($arrowLabels),
+            'arrowData'        => json_encode($arrowData),
+            'topAthleteLabels' => json_encode($topAthleteLabels),
+            'topAthleteData'   => json_encode($topAthleteData),
         ];
 
         return view('dashboard', $data);

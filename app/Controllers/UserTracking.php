@@ -40,7 +40,10 @@ class UserTracking extends BaseController
             'title' => 'Pengguna Aktif',
             'active_menu' => 'users',
             'users' => $users,
-            'hide_ganti_cabor' => true
+            'hide_ganti_cabor' => true,
+            'hide_bottom_nav' => true,
+            'show_back' => true,
+            'back_url' => '/sports'
         ];
 
         return view('users/index', $data);

@@ -150,8 +150,7 @@
             height: 100% !important;
             display: flex !important;
             flex-direction: column !important;
-            overflow-y: scroll !important;
-            scrollbar-gutter: stable !important;
+            overflow: hidden !important;
             position: relative !important;
             background-color: var(--bg-frame) !important;
             margin: 0 auto !important;
@@ -618,6 +617,11 @@
                         <i class='bx bx-refresh text-sm'></i> Ganti
                     </a>
                 <?php endif; ?>
+                <?php if (uri_string() == 'sports' || uri_string() == 'sports/'): ?>
+                    <a href="/users" title="Pengguna Aktif" class="w-8 h-8 rounded-full bg-slate-800/60 hover:bg-slate-800 flex items-center justify-center text-emerald-400 hover:text-emerald-300 transition-all">
+                        <i class='bx bx-user-check text-lg'></i>
+                    </a>
+                <?php endif; ?>
                 <button onclick="toggleDarkMode()" class="w-8 h-8 rounded-full bg-slate-800/60 hover:bg-slate-800 flex items-center justify-center text-slate-300 hover:text-white transition-all">
                     <i class='bx bx-brightness-half text-lg'></i>
                 </button>
@@ -625,7 +629,7 @@
         </div>
 
         <!-- Main Viewport Content Area -->
-        <div class="flex-1 overflow-y-scroll no-scrollbar pb-24 px-4 py-4 relative bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950">
+        <div class="flex-1 overflow-y-auto no-scrollbar px-4 py-4 relative bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950">
             <!-- Alert Messages (Dynamic CI4 Flashdata) -->
             <?php if (session()->getFlashdata('success')): ?>
                 <div class="mb-4 p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-xl text-xs flex items-center gap-2">
@@ -662,7 +666,7 @@
             <?php 
                 $active_menu = $active_menu ?? 'dashboard'; 
             ?>
-            <div class="absolute bottom-0 inset-x-0 bg-slate-950/95 backdrop-blur-lg border-t border-slate-900 px-6 py-2.5 flex items-center justify-between shrink-0 z-30 md:rounded-b-[36px]">
+            <div class="bg-slate-950/95 backdrop-blur-lg border-t border-slate-900 px-6 py-2.5 flex items-center justify-between shrink-0 z-30 md:rounded-b-[36px]">
                 <!-- Nav Item: Dashboard -->
                 <?php 
                     // Need to define brandColor here too for the Dashboard nav item since it is before Scoring nav item

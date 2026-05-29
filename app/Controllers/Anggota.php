@@ -13,7 +13,6 @@ class Anggota extends BaseController
         $this->anggotaModel = new AnggotaModel();
     }
 
-    // List athletes
     public function index()
     {
         $activeCabor = session()->get('active_cabor');
@@ -31,6 +30,44 @@ class Anggota extends BaseController
         return view('anggota/index', $data);
     }
 
+    private function handleUpload($id = null)
+    {
+        $foto = $this->request->getFile('foto');
+        if ($foto && $foto->isValid() && !$foto->hasMoved()) {
+            $namaFoto = $foto->getRandomName();
+            $uploadPath = FCPATH . 'uploads/anggota';
+            
+            if (!is_dir($uploadPath)) {
+                mkdir($uploadPath, 0777, true);
+            }
+            
+            // Hapus foto lama jika sedang update
+            if ($id) {
+                $oldData = $this->anggotaModel->find($id);
+                if ($oldData && !empty($oldData['foto']) && file_exists($uploadPath . '/' . $oldData['foto'])) {
+                    unlink($uploadPath . '/' . $oldData['foto']);
+                }
+            }
+            
+            // Pindahkan file
+            $foto->move($uploadPath, $namaFoto);
+            
+            // Resize dan kompres otomatis menjadi persegi 300x300
+            try {
+                \Config\Services::image()
+                    ->withFile($uploadPath . '/' . $namaFoto)
+                    ->fit(300, 300, 'center')
+                    ->save($uploadPath . '/' . $namaFoto, 75);
+            } catch (\Exception $e) {
+                // Abaikan jika library GD tidak aktif, biarkan original
+            }
+            
+            return $namaFoto;
+        }
+        
+        return false;
+    }
+
     // Store new athlete
     public function store()
     {
@@ -42,6 +79,8 @@ class Anggota extends BaseController
             return redirect()->back()->withInput()->with('error', 'Nama atlet minimal 3 karakter!');
         }
 
+        $namaFoto = $this->handleUpload();
+
         $this->anggotaModel->save([
             'cabor'         => session()->get('active_cabor') ?: 'Panahan',
             'nama'          => $this->request->getPost('nama'),
@@ -51,6 +90,7 @@ class Anggota extends BaseController
             'divisi'        => $this->request->getPost('divisi'),
             'klub'          => $this->request->getPost('klub'),
             'kota'          => $this->request->getPost('kota'),
+            'foto'          => $namaFoto ?: null,
         ]);
 
         return redirect()->to('/anggota')->with('success', 'Atlet berhasil ditambahkan!');
@@ -67,7 +107,9 @@ class Anggota extends BaseController
             return redirect()->back()->with('error', 'Nama atlet minimal 3 karakter!');
         }
 
-        $this->anggotaModel->update($id, [
+        $namaFoto = $this->handleUpload($id);
+        
+        $data = [
             'cabor'         => session()->get('active_cabor') ?: 'Panahan',
             'nama'          => $this->request->getPost('nama'),
             'telepon'       => $this->request->getPost('telepon'),
@@ -76,7 +118,13 @@ class Anggota extends BaseController
             'divisi'        => $this->request->getPost('divisi'),
             'klub'          => $this->request->getPost('klub'),
             'kota'          => $this->request->getPost('kota'),
-        ]);
+        ];
+        
+        if ($namaFoto !== false) {
+            $data['foto'] = $namaFoto;
+        }
+
+        $this->anggotaModel->update($id, $data);
 
         return redirect()->to('/anggota')->with('success', 'Data atlet berhasil diubah!');
     }
@@ -84,6 +132,12 @@ class Anggota extends BaseController
     // Delete athlete
     public function delete($id)
     {
+        // Delete photo if exists
+        $oldData = $this->anggotaModel->find($id);
+        if ($oldData && !empty($oldData['foto']) && file_exists(FCPATH . 'uploads/anggota/' . $oldData['foto'])) {
+            unlink(FCPATH . 'uploads/anggota/' . $oldData['foto']);
+        }
+        
         $this->anggotaModel->delete($id);
         return redirect()->to('/anggota')->with('success', 'Atlet berhasil dihapus!');
     }
