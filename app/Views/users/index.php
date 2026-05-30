@@ -65,7 +65,7 @@
                 $statusText = $days . " hari lalu";
             }
         ?>
-            <div class="user-item bg-slate-800/40 border <?= $isOnline ? 'border-brand-500/30' : 'border-slate-700/50' ?> rounded-2xl p-4 flex items-center justify-between hover:bg-slate-800/60 transition-all group overflow-hidden" data-name="<?= esc(strtolower($user['name'] ?? '')) ?>" data-email="<?= esc(strtolower($user['email'])) ?>">
+            <div onclick="showUserDetail('<?= esc(addslashes($user['name'] ?? $user['email'])) ?>', '<?= esc(addslashes($user['email'])) ?>', '<?= !empty($user['picture']) ? esc(addslashes($user['picture'])) : '' ?>', '<?= $statusText ?>', '<?= date('d M Y H:i', strtotime($user['created_at'])) ?>', '<?= $isOnline ?>')" class="user-item bg-slate-800/40 border <?= $isOnline ? 'border-brand-500/30' : 'border-slate-700/50' ?> rounded-2xl p-4 flex items-center justify-between hover:bg-slate-800/80 hover:-translate-y-1 hover:shadow-[0_8px_20px_rgba(0,0,0,0.3)] hover:border-brand-500/50 active:scale-[0.98] transition-all duration-300 group overflow-hidden cursor-pointer" data-name="<?= esc(strtolower($user['name'] ?? '')) ?>" data-email="<?= esc(strtolower($user['email'])) ?>">
                 <div class="flex items-center gap-3 overflow-hidden min-w-0">
                     <div class="w-10 h-10 rounded-full <?= $isOnline ? 'bg-brand-500/20 text-brand-400' : 'bg-slate-700/50 text-slate-400' ?> flex items-center justify-center relative shrink-0">
                         <?php if (!empty($user['picture'])): ?>
@@ -96,7 +96,7 @@
                     <?php else: ?>
                         <span class="text-xs font-semibold text-slate-400"><?= $statusText ?></span>
                     <?php endif; ?>
-                    <button onclick="confirmDelete(<?= $user['id'] ?>, '<?= esc($user['email']) ?>')"
+                    <button onclick="event.stopPropagation(); confirmDelete(<?= $user['id'] ?>, '<?= esc($user['email']) ?>')"
                         class="w-7 h-7 rounded-full bg-slate-700/50 hover:bg-rose-500/20 flex items-center justify-center text-slate-500 hover:text-rose-400 transition-all opacity-0 group-hover:opacity-100">
                         <i class='bx bx-x text-base'></i>
                     </button>
@@ -126,47 +126,131 @@
         });
     }
 
+    window.showUserDetail = function(name, email, picture, statusText, joinedDate, isOnline) {
+        const isDark = !document.documentElement.classList.contains('light-mode');
+        
+        let imgHtml = picture 
+            ? `<img src="${picture}" class="w-24 h-24 rounded-full mx-auto mb-4 border-4 ${isOnline === '1' ? 'border-brand-500/40 shadow-[0_0_15px_rgba(139,92,246,0.3)]' : 'border-slate-700/50 shadow-lg'} object-cover" referrerpolicy="no-referrer">`
+            : `<div class="w-24 h-24 rounded-full mx-auto mb-4 border-4 ${isOnline === '1' ? 'border-brand-500/40 shadow-[0_0_15px_rgba(139,92,246,0.3)]' : 'border-slate-700/50 shadow-lg'} bg-slate-800 flex items-center justify-center"><i class='bx bx-user text-5xl text-slate-500'></i></div>`;
+            
+        let statusBadge = isOnline === '1'
+            ? `<span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-widest mb-2"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span> Online Sekarang</span>`
+            : `<span class="inline-flex items-center px-3.5 py-1.5 rounded-full bg-slate-700/50 border border-slate-600/50 text-slate-400 text-[10px] font-black uppercase tracking-widest mb-2"><i class='bx bx-time-five mr-1 text-sm'></i> Terakhir: ${statusText}</span>`;
+
+        Swal.fire({
+            html: `
+                <div class="text-center pt-4 pb-2">
+                    <div class="relative inline-block">
+                        ${imgHtml}
+                    </div>
+                    
+                    <h2 class="text-2xl font-black ${isDark ? 'text-white' : 'text-slate-800'} mb-1 tracking-tight">${name}</h2>
+                    <p class="text-sm font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'} mb-5">${email}</p>
+                    
+                    ${statusBadge}
+                    
+                    <div class="mt-6 p-4 rounded-3xl ${isDark ? 'bg-slate-900/60' : 'bg-slate-50'} border ${isDark ? 'border-slate-800/80' : 'border-slate-200'} text-left shadow-inner">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-2xl bg-brand-500/10 flex items-center justify-center text-brand-400 shrink-0 shadow-sm border border-brand-500/10">
+                                <i class='bx bx-calendar-check text-xl'></i>
+                            </div>
+                            <div>
+                                <p class="text-[9px] uppercase font-black text-slate-500 tracking-wider">Tanggal Bergabung</p>
+                                <p class="text-sm font-bold ${isDark ? 'text-slate-200' : 'text-slate-700'} mt-0.5">${joinedDate}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `,
+            showConfirmButton: true,
+            confirmButtonText: '<i class="bx bx-check mr-1 text-lg"></i> Tutup',
+            confirmButtonColor: '#8b5cf6',
+            background: isDark ? '#1e293b' : '#ffffff',
+            customClass: {
+                popup: 'rounded-[32px] border ' + (isDark ? 'border-slate-700/50' : 'border-slate-200'),
+                confirmButton: 'rounded-2xl px-8 py-3 font-bold shadow-lg shadow-brand-500/20 active:scale-95 transition-all text-sm flex items-center'
+            }
+        });
+    }
+
 </script>
 
-<!-- Search Script -->
+<!-- Search & Auto-Refresh Script -->
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const searchInput = document.getElementById('search-user');
+    window.filterUsers = function(term) {
+        term = term.toLowerCase();
+        const items = document.querySelectorAll('.user-item');
         const clearBtn = document.getElementById('clear-search');
-        if (!searchInput) return;
-
-        function filterUsers(term) {
-            term = term.toLowerCase();
-            const items = document.querySelectorAll('.user-item');
+        
+        items.forEach(item => {
+            const name = item.getAttribute('data-name') || '';
+            const email = item.getAttribute('data-email') || '';
             
-            items.forEach(item => {
-                const name = item.getAttribute('data-name');
-                const email = item.getAttribute('data-email');
-                
-                if (name.includes(term) || email.includes(term)) {
-                    item.style.display = 'flex';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-            
-            // Toggle clear button
+            if (name.includes(term) || email.includes(term)) {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+        
+        if (clearBtn) {
             if (term.length > 0) {
                 clearBtn.classList.remove('hidden');
             } else {
                 clearBtn.classList.add('hidden');
             }
         }
+    };
 
-        searchInput.addEventListener('input', function(e) {
-            filterUsers(e.target.value);
-        });
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('search-user');
+        const clearBtn = document.getElementById('clear-search');
         
-        clearBtn.addEventListener('click', function() {
-            searchInput.value = '';
-            filterUsers('');
-            searchInput.focus();
-        });
+        if (searchInput) {
+            searchInput.addEventListener('input', function(e) {
+                window.filterUsers(e.target.value);
+            });
+            
+            if (clearBtn) {
+                clearBtn.addEventListener('click', function() {
+                    searchInput.value = '';
+                    window.filterUsers('');
+                    searchInput.focus();
+                });
+            }
+        }
+
+        // Auto-refresh using AJAX polling
+        let autoRefreshInterval = setInterval(() => {
+            // Check if page is hidden to save battery
+            if (document.hidden) return;
+
+            fetch(window.location.href, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest', 'Cache-Control': 'no-cache' }
+            })
+            .then(res => res.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const newContainer = doc.getElementById('users-container');
+                
+                if (newContainer) {
+                    const oldContainer = document.getElementById('users-container');
+                    if (oldContainer) {
+                        oldContainer.innerHTML = newContainer.innerHTML;
+                        
+                        // Re-apply search filter
+                        if (searchInput && searchInput.value) {
+                            window.filterUsers(searchInput.value);
+                        }
+                    }
+                }
+            })
+            .catch(err => console.error("Error auto-refreshing users:", err));
+        }, 3000); // Update every 3 seconds
+
+        // Clear interval if pjax navigates away
+        window.addEventListener('popstate', () => clearInterval(autoRefreshInterval), {once:true});
     });
 </script>
 
