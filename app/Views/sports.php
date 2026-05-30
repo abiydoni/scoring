@@ -99,9 +99,6 @@ window.updateUserIdentityCard = () => {
         
         actionEl.innerHTML = `
             <div id="google-login-btn"></div>
-            <button onclick="showManualEmailLogin()" title="Login Manual" class="px-3 h-8 rounded-full bg-slate-700 hover:bg-slate-600 text-white flex items-center gap-1.5 shrink-0 transition-all text-xs font-bold shadow-lg ml-2">
-                <i class='bx bx-envelope text-base'></i> Email
-            </button>
         `;
         
         // Render actual Google Sign-In button (Bypasses One Tap Cooldown)
