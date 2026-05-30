@@ -1,4 +1,10 @@
 <?= $this->extend('layout/main') ?>
+<?php
+/**
+ * @var string $activeCabor
+ * @var array $anggota
+ */
+?>
 
 <?= $this->section('content') ?>
 
@@ -181,7 +187,7 @@
                         <button onclick="editAthlete(<?= htmlspecialchars(json_encode($person)) ?>)" class="w-7 h-7 rounded-lg bg-slate-800/50 hover:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white transition-all" title="Edit Profil">
                             <i class='bx bx-edit-alt text-base'></i>
                         </button>
-                        <button onclick="confirmDelete(<?= $person['id'] ?>, '<?= esc($person['nama']) ?>')" class="w-7 h-7 rounded-lg bg-slate-850/50 hover:bg-rose-950/40 border border-slate-800/30 hover:border-rose-900/40 flex items-center justify-center text-slate-400 hover:text-rose-400 transition-all" title="Hapus Atlet">
+                        <button onclick="confirmDelete(<?= $person['id'] ?>, '<?= esc($person['nama']) ?>')" class="admin-only w-7 h-7 rounded-lg bg-slate-850/50 hover:bg-rose-950/40 border border-slate-800/30 hover:border-rose-900/40 flex items-center justify-center text-slate-400 hover:text-rose-400 transition-all" title="Hapus Atlet">
                             <i class='bx bx-trash text-base'></i>
                         </button>
                     </div>

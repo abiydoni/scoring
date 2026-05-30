@@ -1,4 +1,11 @@
 <?= $this->extend('layout/main') ?>
+<?php
+/**
+ * @var array $anggota
+ * @var array $opponents
+ * @var array $games
+ */
+?>
 
 <?= $this->section('content') ?>
 
@@ -212,14 +219,14 @@
                         <?php if ($game['tipe_game'] === 'aduan' || $game['tipe_game'] === 'mixteam'): ?>
                             <?php if (($game['divisi'] ?? 'recurve') === 'compound'): ?>
                                 <span class="text-[8px] font-bold text-slate-500 uppercase tracking-wide">Skor Akhir</span>
-                                <span class="text-sm font-extrabold text-amber-400 block mt-0.5"><?= $game['total_score'] ?> - <?= $game['total_score_lawan'] ?></span>
+                                <span class="text-xs font-extrabold text-amber-400 block mt-0.5 whitespace-nowrap"><?= $game['total_score'] ?> - <?= $game['total_score_lawan'] ?></span>
                             <?php else: ?>
                                 <span class="text-[8px] font-bold text-slate-500 uppercase tracking-wide">Poin Set</span>
-                                <span class="text-sm font-extrabold text-amber-400 block mt-0.5"><?= $game['set_point_atlet'] ?> - <?= $game['set_point_lawan'] ?></span>
+                                <span class="text-sm font-extrabold text-amber-400 block mt-0.5 whitespace-nowrap"><?= $game['set_point_atlet'] ?> - <?= $game['set_point_lawan'] ?></span>
                             <?php endif; ?>
                         <?php else: ?>
                             <span class="text-[8px] font-bold text-slate-500 uppercase tracking-wide">Total Skor</span>
-                            <span class="text-sm font-extrabold text-emerald-400 block mt-0.5"><?= $game['total_score'] ?></span>
+                            <span class="text-sm font-extrabold text-emerald-400 block mt-0.5 whitespace-nowrap"><?= $game['total_score'] ?></span>
                         <?php endif; ?>
                     </div>
                     <a href="/panahan/game/<?= $game['id'] ?>" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-750 flex items-center justify-center text-slate-400 hover:text-white transition-all">

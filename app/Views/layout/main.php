@@ -615,7 +615,7 @@
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <?php if (session()->get('active_cabor') && (!isset($hide_ganti_cabor) || !$hide_ganti_cabor)): ?>
+                <?php if (session()->get('active_cabor') && (uri_string() === '' || uri_string() === '/') && (!isset($hide_ganti_cabor) || !$hide_ganti_cabor)): ?>
                     <a href="/sports" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/20 hover:bg-brand-500/20 text-brand-400 hover:text-brand-300 text-[10px] font-bold uppercase tracking-wider transition-all">
                         <i class='bx bx-refresh text-sm'></i> Ganti
                     </a>
@@ -1091,14 +1091,18 @@
         }
 
         function checkAdminAccess(email) {
-            const btnAdmin = document.getElementById('btn-users-admin');
-            if (btnAdmin && email) {
+            if (email) {
                 const cleanEmail = email.trim().toLowerCase();
-                if (cleanEmail === 'appsbeem@gmail.com' || cleanEmail === 'abiydoni@gmail.com') {
-                    btnAdmin.classList.add('show');
-                } else {
-                    btnAdmin.classList.remove('show');
-                }
+                const isAdmin = (cleanEmail === 'appsbeem@gmail.com' || cleanEmail === 'abiydoni@gmail.com');
+                const adminElements = document.querySelectorAll('.admin-only');
+                
+                adminElements.forEach(el => {
+                    if (isAdmin) {
+                        el.classList.add('show');
+                    } else {
+                        el.classList.remove('show');
+                    }
+                });
             }
         }
 

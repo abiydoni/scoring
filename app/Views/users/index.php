@@ -21,7 +21,22 @@
     </div>
 </div>
 
-<div class="space-y-4">
+<?php if (!empty($users)): ?>
+<!-- Search Box -->
+<div class="mb-5 relative">
+    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <i class='bx bx-search text-slate-400 text-lg'></i>
+    </div>
+    <input type="text" id="search-user" placeholder="Cari nama atau email..." class="w-full bg-slate-800/60 border border-slate-700/50 text-slate-200 text-sm rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 block pl-10 pr-10 p-2.5 transition-all shadow-sm placeholder-slate-500">
+    <div class="absolute inset-y-0 right-0 pr-2 flex items-center">
+        <button type="button" id="clear-search" class="w-7 h-7 rounded-full text-slate-400 hover:text-white hover:bg-slate-700 flex items-center justify-center transition-all hidden">
+            <i class='bx bx-x text-lg'></i>
+        </button>
+    </div>
+</div>
+<?php endif; ?>
+
+<div class="space-y-4" id="users-container">
     <?php if (empty($users)): ?>
         <div class="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-6 text-center">
             <div class="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center mx-auto mb-3">
@@ -50,7 +65,7 @@
                 $statusText = $days . " hari lalu";
             }
         ?>
-            <div class="bg-slate-800/40 border <?= $isOnline ? 'border-brand-500/30' : 'border-slate-700/50' ?> rounded-2xl p-4 flex items-center justify-between hover:bg-slate-800/60 transition-all group overflow-hidden">
+            <div class="user-item bg-slate-800/40 border <?= $isOnline ? 'border-brand-500/30' : 'border-slate-700/50' ?> rounded-2xl p-4 flex items-center justify-between hover:bg-slate-800/60 transition-all group overflow-hidden" data-name="<?= esc(strtolower($user['name'] ?? '')) ?>" data-email="<?= esc(strtolower($user['email'])) ?>">
                 <div class="flex items-center gap-3 overflow-hidden min-w-0">
                     <div class="w-10 h-10 rounded-full <?= $isOnline ? 'bg-brand-500/20 text-brand-400' : 'bg-slate-700/50 text-slate-400' ?> flex items-center justify-center relative shrink-0">
                         <?php if (!empty($user['picture'])): ?>
@@ -111,6 +126,48 @@
         });
     }
 
+</script>
+
+<!-- Search Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('search-user');
+        const clearBtn = document.getElementById('clear-search');
+        if (!searchInput) return;
+
+        function filterUsers(term) {
+            term = term.toLowerCase();
+            const items = document.querySelectorAll('.user-item');
+            
+            items.forEach(item => {
+                const name = item.getAttribute('data-name');
+                const email = item.getAttribute('data-email');
+                
+                if (name.includes(term) || email.includes(term)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+            
+            // Toggle clear button
+            if (term.length > 0) {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+            }
+        }
+
+        searchInput.addEventListener('input', function(e) {
+            filterUsers(e.target.value);
+        });
+        
+        clearBtn.addEventListener('click', function() {
+            searchInput.value = '';
+            filterUsers('');
+            searchInput.focus();
+        });
+    });
 </script>
 
 <?= $this->endSection() ?>

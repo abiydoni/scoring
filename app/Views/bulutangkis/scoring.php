@@ -89,7 +89,10 @@
                         }
                     ?>
                     <h3 class="text-xs font-bold text-white truncate px-1" title="<?= $timKita ?>"><?= $timKita ?></h3>
-                    <span class="text-[9px] text-emerald-400 font-semibold uppercase">Tim Kita</span>
+                    <div class="flex items-center justify-center gap-2 mt-0.5">
+                        <span class="text-[9px] text-emerald-400 font-semibold uppercase">Tim Kita</span>
+                        <span id="serve_indicator_atlet" class="text-[8px] bg-amber-500 text-amber-950 px-1.5 py-0.5 rounded font-black tracking-widest opacity-0 transition-opacity duration-300 shadow-[0_0_10px_rgba(245,158,11,0.5)]">SERVE</span>
+                    </div>
                 </div>
                 
                 <!-- Big Touch Area -->
@@ -139,7 +142,10 @@
                     <h3 class="text-xs font-bold text-white truncate px-1" title="<?= $timLawan ?>">
                         <?= $timLawan ?>
                     </h3>
-                    <span class="text-[9px] text-rose-400 font-semibold uppercase">Lawan</span>
+                    <div class="flex items-center justify-center gap-2 mt-0.5">
+                        <span class="text-[9px] text-rose-400 font-semibold uppercase">Lawan</span>
+                        <span id="serve_indicator_lawan" class="text-[8px] bg-amber-500 text-amber-950 px-1.5 py-0.5 rounded font-black tracking-widest opacity-0 transition-opacity duration-300 shadow-[0_0_10px_rgba(245,158,11,0.5)]">SERVE</span>
+                    </div>
                 </div>
                 
                 <!-- Big Touch Area -->
@@ -191,6 +197,17 @@
                     el.classList.remove('animate-[pop_0.2s_ease-out]');
                     void el.offsetWidth; // trigger reflow
                     el.classList.add('animate-[pop_0.2s_ease-out]');
+
+                    // Set serve indicator
+                    document.getElementById('serve_indicator_atlet').classList.replace('opacity-100', 'opacity-0');
+                    document.getElementById('serve_indicator_lawan').classList.replace('opacity-100', 'opacity-0');
+                    document.getElementById('serve_indicator_atlet').classList.remove('animate-pulse');
+                    document.getElementById('serve_indicator_lawan').classList.remove('animate-pulse');
+                    
+                    let indicator = player === 'atlet' ? document.getElementById('serve_indicator_atlet') : document.getElementById('serve_indicator_lawan');
+                    indicator.classList.replace('opacity-0', 'opacity-100');
+                    indicator.classList.add('animate-pulse');
+
                 } else if (action === 'minus' && currentScore > 0) {
                     currentScore--;
                 } else {
