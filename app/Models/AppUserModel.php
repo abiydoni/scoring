@@ -14,6 +14,8 @@ class AppUserModel extends Model
 
     protected $allowedFields    = [
         'email',
+        'name',
+        'picture',
         'last_online'
     ];
 

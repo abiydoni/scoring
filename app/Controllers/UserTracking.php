@@ -9,6 +9,9 @@ class UserTracking extends BaseController
     public function record_online()
     {
         $email = $this->request->getPost('email');
+        $name = $this->request->getPost('name');
+        $picture = $this->request->getPost('picture');
+
         if (!$email) {
             return $this->response->setJSON(['status' => 'error', 'message' => 'Email is required']);
         }
@@ -21,6 +24,9 @@ class UserTracking extends BaseController
             'email' => $email,
             'last_online' => date('Y-m-d H:i:s')
         ];
+
+        if ($name) $data['name'] = $name;
+        if ($picture) $data['picture'] = $picture;
 
         if ($user) {
             $userModel->update($user['id'], $data);

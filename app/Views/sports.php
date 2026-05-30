@@ -17,6 +17,142 @@
     <p class="text-xs text-slate-300 mt-2.5 leading-relaxed max-w-[90%] drop-shadow-md">Pilih cabang olahraga di bawah ini untuk memulai pencatatan statistik dan skor pertandingan secara presisi.</p>
 </div>
 
+<!-- Logged In Identity Card (Dynamic via JS) -->
+<div id="user-identity-card" class="mb-6 mx-4 animate-[slideDown_0.6s_ease-out]">
+    <div class="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-4 flex items-center gap-4 backdrop-blur-md relative overflow-hidden group hover:bg-slate-800/80 transition-all shadow-lg shadow-slate-900/40" id="identity-card-inner">
+        <!-- Decoration -->
+        <div class="absolute -right-4 -top-4 w-24 h-24 bg-brand-500/10 rounded-full blur-2xl group-hover:bg-brand-500/20 transition-all"></div>
+        
+        <div id="user-identity-avatar" class="w-12 h-12 rounded-full bg-slate-700/50 flex items-center justify-center border-2 border-slate-600/50 shrink-0 relative z-10 overflow-hidden text-slate-400">
+            <i class='bx bx-user text-xl'></i>
+        </div>
+        
+        <div class="flex-1 min-w-0 relative z-10">
+            <p id="user-identity-label" class="text-[10px] font-bold tracking-wider text-slate-400 uppercase mb-0.5">Memuat...</p>
+            <h4 id="user-identity-name" class="text-sm font-semibold text-slate-200 truncate">Harap Tunggu...</h4>
+            <p id="user-identity-email" class="text-[11px] text-slate-500 truncate mt-0.5"></p>
+        </div>
+        
+        <div id="user-identity-action" class="relative z-10 flex items-center gap-2">
+            <!-- Buttons injected by JS -->
+        </div>
+    </div>
+</div>
+
+<!-- Script to populate identity -->
+<script>
+window.updateUserIdentityCard = () => {
+    const email = localStorage.getItem('app_user_email');
+    const name = localStorage.getItem('app_user_name');
+    const picture = localStorage.getItem('app_user_picture');
+    
+    const card = document.getElementById('user-identity-card');
+    const avatar = document.getElementById('user-identity-avatar');
+    const labelEl = document.getElementById('user-identity-label');
+    const nameEl = document.getElementById('user-identity-name');
+    const emailEl = document.getElementById('user-identity-email');
+    const actionEl = document.getElementById('user-identity-action');
+    
+    const sportCards = document.querySelectorAll('.sport-card');
+    
+    if (!avatar || !nameEl) return;
+    
+    if (email) {
+        // LOGGED IN STATE
+        if (picture) {
+            avatar.innerHTML = `<img src="${picture}" class="w-full h-full object-cover" referrerpolicy="no-referrer">`;
+            avatar.className = "w-12 h-12 rounded-full flex items-center justify-center border-2 shrink-0 relative z-10 overflow-hidden border-brand-500/50";
+        } else {
+            avatar.innerHTML = `<i class='bx bx-user text-xl'></i>`;
+            avatar.className = "w-12 h-12 rounded-full flex items-center justify-center border-2 shrink-0 relative z-10 overflow-hidden bg-brand-500/20 text-brand-400 border-brand-500/30";
+        }
+        
+        labelEl.className = "text-[10px] font-bold tracking-wider text-emerald-400 uppercase mb-0.5";
+        labelEl.innerHTML = "<i class='bx bx-check-circle'></i> Berhasil Login";
+        nameEl.textContent = name ? name : email;
+        emailEl.textContent = name ? email : 'Akun Lokal';
+        
+        actionEl.innerHTML = `
+            <div class="w-8 h-8 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0" title="Terverifikasi">
+                <i class='bx bx-check-shield text-lg'></i>
+            </div>
+            <button onclick="logoutUser()" title="Keluar Akun" class="w-8 h-8 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500/20 hover:text-rose-300 flex items-center justify-center shrink-0 transition-all">
+                <i class='bx bx-log-out text-lg'></i>
+            </button>
+        `;
+        
+        // ENABLE CARDS
+        sportCards.forEach(c => {
+            c.classList.remove('grayscale', 'opacity-60', 'saturate-50');
+            c.removeAttribute('data-locked');
+        });
+        
+    } else {
+        // LOGGED OUT STATE
+        avatar.innerHTML = `<i class='bx bx-user-x text-xl'></i>`;
+        avatar.className = "w-12 h-12 rounded-full flex items-center justify-center border-2 shrink-0 relative z-10 overflow-hidden bg-slate-700/50 border-slate-600/50 text-slate-400";
+        
+        labelEl.className = "text-[10px] font-bold tracking-wider text-slate-400 uppercase mb-0.5";
+        labelEl.textContent = 'Akses Terkunci';
+        nameEl.textContent = 'Mode Tamu';
+        emailEl.innerHTML = '<span class="text-brand-400 font-semibold animate-pulse">Login Google di sini 👉</span>';
+        
+        actionEl.innerHTML = `
+            <div id="google-login-btn"></div>
+            <button onclick="showManualEmailLogin()" title="Login Manual" class="px-3 h-8 rounded-full bg-slate-700 hover:bg-slate-600 text-white flex items-center gap-1.5 shrink-0 transition-all text-xs font-bold shadow-lg ml-2">
+                <i class='bx bx-envelope text-base'></i> Email
+            </button>
+        `;
+        
+        // Render actual Google Sign-In button (Bypasses One Tap Cooldown)
+        const renderGButton = () => {
+            const btnContainer = document.getElementById('google-login-btn');
+            if (!btnContainer) return;
+            
+            if (typeof google !== 'undefined' && google.accounts && google.accounts.id) {
+                google.accounts.id.initialize({
+                    client_id: '215408546614-3et2rjsrmlm1pbt1q9m9emb4rv0l5g9j.apps.googleusercontent.com',
+                    callback: (typeof handleGoogleCredentialResponse !== 'undefined') ? handleGoogleCredentialResponse : () => {}
+                });
+                google.accounts.id.renderButton(
+                    btnContainer,
+                    { theme: 'filled_black', size: 'medium', shape: 'pill', text: 'signin' }
+                );
+            } else {
+                setTimeout(renderGButton, 200);
+            }
+        };
+        renderGButton();
+        
+        // DISABLE CARDS
+        sportCards.forEach(c => {
+            c.classList.add('grayscale', 'opacity-60', 'saturate-50');
+            c.setAttribute('data-locked', 'true');
+            c.addEventListener('click', function lockedClickHandler(e) {
+                if (c.getAttribute('data-locked') === 'true') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    Swal.fire({
+                        title: 'Akses Ditolak',
+                        text: 'Silakan login menggunakan Google (atau Email) terlebih dahulu untuk bisa masuk ke modul scoring olahraga.',
+                        icon: 'warning',
+                        confirmButtonText: 'Oke',
+                        confirmButtonColor: '#0ea5e9',
+                        background: document.documentElement.classList.contains('light-mode') ? '#ffffff' : '#1e293b',
+                        color: document.documentElement.classList.contains('light-mode') ? '#0f172a' : '#f8fafc'
+                    });
+                }
+            });
+        });
+    }
+};
+
+window.updateUserIdentityCard();
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', window.updateUserIdentityCard);
+}
+</script>
+
 <!-- Sports Grid (Vibrant Full-Color Cards) -->
 <div class="flex flex-col gap-5 mb-8">
     
@@ -43,7 +179,7 @@
         $isActive = (strtolower($activeCabor) === strtolower($sport['name']));
         $delay += 150;
     ?>
-    <a href="/sports/select/<?= esc($sport['name']) ?>" style="animation-delay: <?= $delay ?>ms;" class="group relative overflow-hidden rounded-[2rem] flex flex-col p-6 transition-all duration-500 hover:-translate-y-2 hover:scale-[1.02] hover:shadow-2xl <?= $sport['shadow'] ?> active:scale-95 animate-[slideUp_0.6s_ease-out_both] <?= $isActive ? 'ring-4 ring-white/30' : '' ?>">
+    <a href="/sports/select/<?= esc($sport['name']) ?>" style="animation-delay: <?= $delay ?>ms;" class="sport-card group relative overflow-hidden rounded-[2rem] flex flex-col p-6 transition-all duration-500 hover:-translate-y-2 hover:scale-[1.02] hover:shadow-2xl <?= $sport['shadow'] ?> active:scale-95 animate-[slideUp_0.6s_ease-out_both] <?= $isActive ? 'ring-4 ring-white/30' : '' ?>">
         
         <!-- Vibrant Gradient Background -->
         <div class="absolute inset-0 bg-gradient-to-br <?= $sport['gradient'] ?> opacity-90 group-hover:opacity-100 transition-opacity duration-500"></div>

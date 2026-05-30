@@ -9,12 +9,16 @@
         </h2>
         <p class="text-sm text-slate-400">Daftar pengguna aplikasi dan status online terakhir.</p>
     </div>
-    <?php if (!empty($users)): ?>
-        <button onclick="confirmClearAll()"
-            class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-rose-500/10 border border-rose-500/20 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 text-[10px] font-bold uppercase tracking-wider transition-all shrink-0">
-            <i class='bx bx-trash text-sm'></i> Hapus Semua
-        </button>
-    <?php endif; ?>
+    <div class="flex items-center gap-2">
+        <a href="/settings" title="Pengaturan" class="w-8 h-8 rounded-full bg-slate-800/50 border border-slate-700/50 text-slate-400 hover:text-white hover:bg-slate-700 flex items-center justify-center transition-all shadow-sm">
+            <i class='bx bx-cog text-lg'></i>
+        </a>
+        <?php if (!empty($users)): ?>
+            <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-800/50 border border-slate-700/50 text-slate-300 text-[10px] font-bold uppercase tracking-wider shrink-0 shadow-sm">
+                <i class='bx bx-group text-sm text-brand-400'></i> <?= count($users) ?> Total
+            </div>
+        <?php endif; ?>
+    </div>
 </div>
 
 <div class="space-y-4">
@@ -46,17 +50,26 @@
                 $statusText = $days . " hari lalu";
             }
         ?>
-            <div class="bg-slate-800/40 border <?= $isOnline ? 'border-brand-500/30' : 'border-slate-700/50' ?> rounded-2xl p-4 flex items-center justify-between hover:bg-slate-800/60 transition-all group">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full <?= $isOnline ? 'bg-brand-500/20 text-brand-400' : 'bg-slate-700/50 text-slate-400' ?> flex items-center justify-center relative">
-                        <i class='bx bx-user text-xl'></i>
+            <div class="bg-slate-800/40 border <?= $isOnline ? 'border-brand-500/30' : 'border-slate-700/50' ?> rounded-2xl p-4 flex items-center justify-between hover:bg-slate-800/60 transition-all group overflow-hidden">
+                <div class="flex items-center gap-3 overflow-hidden min-w-0">
+                    <div class="w-10 h-10 rounded-full <?= $isOnline ? 'bg-brand-500/20 text-brand-400' : 'bg-slate-700/50 text-slate-400' ?> flex items-center justify-center relative shrink-0">
+                        <?php if (!empty($user['picture'])): ?>
+                            <img src="<?= esc($user['picture']) ?>" alt="Profile" class="w-full h-full rounded-full object-cover <?= $isOnline ? '' : 'grayscale opacity-80' ?>" referrerpolicy="no-referrer">
+                        <?php else: ?>
+                            <i class='bx bx-user text-xl'></i>
+                        <?php endif; ?>
+                        
                         <?php if ($isOnline): ?>
-                            <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-slate-900 rounded-full"></div>
+                            <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-slate-900 rounded-full z-10"></div>
                         <?php endif; ?>
                     </div>
-                    <div>
-                        <h3 class="text-sm font-semibold text-slate-200"><?= esc($user['email']) ?></h3>
-                        <p class="text-[10px] text-slate-500 mt-0.5">Mendaftar: <?= date('d M Y', strtotime($user['created_at'])) ?></p>
+                    <div class="truncate pr-2">
+                        <h3 class="text-sm font-semibold text-slate-200 truncate">
+                            <?= !empty($user['name']) ? esc($user['name']) : esc($user['email']) ?>
+                        </h3>
+                        <p class="text-[10px] text-slate-500 mt-0.5 truncate">
+                            <?= !empty($user['name']) ? esc($user['email']) . ' &bull; ' : '' ?>Mendaftar: <?= date('d M', strtotime($user['created_at'])) ?>
+                        </p>
                     </div>
                 </div>
                 <div class="text-right flex items-center gap-2">
@@ -98,24 +111,6 @@
         });
     }
 
-    function confirmClearAll() {
-        Swal.fire({
-            title: 'Hapus Semua User?',
-            text: 'Semua data pengguna akan dihapus permanen dari database!',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#ef4444',
-            cancelButtonColor: '#475569',
-            confirmButtonText: 'Ya, Hapus Semua',
-            cancelButtonText: 'Batal',
-            background: document.documentElement.classList.contains('light-mode') ? '#ffffff' : '#1e293b',
-            color: document.documentElement.classList.contains('light-mode') ? '#0f172a' : '#f8fafc',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = '/users/clear-all';
-            }
-        });
-    }
 </script>
 
 <?= $this->endSection() ?>

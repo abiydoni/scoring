@@ -37,3 +37,7 @@ $routes->post('/user/record-online', 'UserTracking::record_online');
 $routes->get('/users', 'UserTracking::index');
 $routes->get('/users/delete/(:num)', 'UserTracking::delete/$1');
 $routes->get('/users/clear-all', 'UserTracking::clearAll');
+
+// Settings
+$routes->get('/settings', 'Settings::index');
+$routes->get('/settings/backup', 'Settings::backup');

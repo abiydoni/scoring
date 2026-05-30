@@ -590,6 +590,9 @@
             0%, 100% { opacity: 1; transform: scale(1); }
             50% { opacity: .5; transform: scale(0.85); }
         }
+        
+        .admin-only { display: none !important; }
+        .admin-only.show { display: flex !important; }
     </style>
 </head>
 <body class="h-full flex items-center justify-center overflow-x-hidden md:py-4">
@@ -621,10 +624,12 @@
                     <button onclick="navigator.share ? navigator.share({title: 'Appsbee Scoring', url: window.location.href}) : alert('Fitur share tidak didukung di browser ini.')" title="Bagikan Aplikasi" class="w-8 h-8 rounded-full bg-slate-800/60 hover:bg-brand-600 flex items-center justify-center text-brand-400 hover:text-white transition-all">
                         <i class='bx bx-share-alt text-lg'></i>
                     </button>
-                    <a href="/users" title="Pengguna Aktif" class="w-8 h-8 rounded-full bg-slate-800/60 hover:bg-slate-800 flex items-center justify-center text-emerald-400 hover:text-emerald-300 transition-all">
+                    
+                    <a href="/users" id="btn-users-admin" title="Pengguna Aktif" class="admin-only w-8 h-8 rounded-full bg-slate-800/60 hover:bg-slate-800 items-center justify-center text-emerald-400 hover:text-emerald-300 transition-all">
                         <i class='bx bx-user-check text-lg'></i>
                     </a>
                 <?php endif; ?>
+                
                 <button onclick="toggleDarkMode()" class="w-8 h-8 rounded-full bg-slate-800/60 hover:bg-slate-800 flex items-center justify-center text-slate-300 hover:text-white transition-all">
                     <i class='bx bx-brightness-half text-lg'></i>
                 </button>
@@ -769,6 +774,11 @@
                     if (!link.hasAttribute('data-pjax-bound')) {
                         link.setAttribute('data-pjax-bound', 'true');
                         link.addEventListener('click', function(e) {
+                            if (link.getAttribute('data-locked') === 'true') {
+                                e.preventDefault();
+                                e.stopImmediatePropagation();
+                                return;
+                            }
                             e.preventDefault();
                             loadPjaxPage(href, true);
                         });
@@ -832,6 +842,8 @@
 
                         // Sync active menu state or any global triggers
                         updateThemeIcon();
+                        const currentEmail = localStorage.getItem('app_user_email');
+                        if (currentEmail) checkAdminAccess(currentEmail);
                     }
                     
                     // Smoothly fade out the loader once page content is successfully swapped and scripts execute
@@ -973,14 +985,18 @@
             }
         }
 
-        function recordUserOnline(email) {
+        function recordUserOnline(email, name = null, picture = null) {
+            const data = { email: email };
+            if (name) data.name = name;
+            if (picture) data.picture = picture;
+
             fetch('/user/record-online', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                     'X-Requested-With': 'XMLHttpRequest'
                 },
-                body: new URLSearchParams({ email: email })
+                body: new URLSearchParams(data)
             }).catch(e => console.error('Error recording online status:', e));
         }
 
@@ -998,11 +1014,23 @@
                 const responsePayload = decodeJwtResponse(response.credential);
                 const userEmail = responsePayload.email;
                 const userName = responsePayload.name;
+                const userPicture = responsePayload.picture;
                 
                 if (userEmail) {
                     localStorage.setItem('app_user_email', userEmail);
-                    recordUserOnline(userEmail);
+                    if (userName) localStorage.setItem('app_user_name', userName);
+                    if (userPicture) localStorage.setItem('app_user_picture', userPicture);
+                    localStorage.setItem('app_migrated', '1');
                     
+                    recordUserOnline(userEmail, userName, userPicture);
+                    checkAdminAccess(userEmail);
+                    
+                    // Update the UI immediately without refreshing
+                    if (typeof window.updateUserIdentityCard === 'function') {
+                        window.updateUserIdentityCard();
+                    }
+                    
+                    console.log("[Google Sign-In] Success:", userEmail);    
                     Swal.fire({
                         toast: true,
                         position: 'top-end',
@@ -1044,6 +1072,7 @@
                 if (result.isConfirmed && result.value) {
                     localStorage.setItem('app_user_email', result.value);
                     recordUserOnline(result.value);
+                    checkAdminAccess(result.value);
                     
                     Swal.fire({
                         toast: true,
@@ -1061,8 +1090,28 @@
             });
         }
 
+        function checkAdminAccess(email) {
+            const btnAdmin = document.getElementById('btn-users-admin');
+            if (btnAdmin && email) {
+                const cleanEmail = email.trim().toLowerCase();
+                if (cleanEmail === 'appsbeem@gmail.com' || cleanEmail === 'abiydoni@gmail.com') {
+                    btnAdmin.classList.add('show');
+                } else {
+                    btnAdmin.classList.remove('show');
+                }
+            }
+        }
+
         function checkUserEmail() {
             let email = localStorage.getItem('app_user_email');
+            let name = localStorage.getItem('app_user_name');
+            // Force Google prompt again if identity data is missing (upgrade path) - ONE TIME ONLY
+            if (email && !name && !localStorage.getItem('app_migrated')) {
+                localStorage.removeItem('app_user_email');
+                localStorage.setItem('app_migrated', '1');
+                email = null;
+            }
+
             if (!email) {
                 const initGoogle = () => {
                     if (typeof google !== 'undefined' && google.accounts && google.accounts.id) {
@@ -1081,9 +1130,9 @@
                             if (notification.isNotDisplayed()) {
                                 // Truly blocked (e.g. third-party cookies, suppressed) -> fallback
                                 console.warn('[Google One Tap] Not displayed. Reason:', reason);
-                                showManualEmailLogin();
+                                window.googlePromptCooldown = true;
                             }
-                            // isSkippedMoment / isDismissedMoment = user closed it intentionally, don't force manual
+                            // isSkippedMoment / isDismissedMoment = user closed it intentionally
                         });
                     } else {
                         setTimeout(initGoogle, 100);
@@ -1091,7 +1140,10 @@
                 };
                 initGoogle();
             } else {
-                recordUserOnline(email);
+                let name = localStorage.getItem('app_user_name');
+                let picture = localStorage.getItem('app_user_picture');
+                recordUserOnline(email, name, picture);
+                checkAdminAccess(email);
                 setTimeout(showAppInstallPrompt, 1500);
             }
         }
@@ -1334,6 +1386,28 @@
             modal.classList.add('hidden');
         }, 300);
     }
+        function logoutUser() {
+            Swal.fire({
+                title: 'Keluar Akun?',
+                text: "Anda akan keluar dari sesi saat ini.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#475569',
+                confirmButtonText: 'Ya, Keluar',
+                cancelButtonText: 'Batal',
+                background: document.documentElement.classList.contains('light-mode') ? '#ffffff' : '#1e293b',
+                color: document.documentElement.classList.contains('light-mode') ? '#0f172a' : '#f8fafc'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    localStorage.removeItem('app_user_email');
+                    localStorage.removeItem('app_user_name');
+                    localStorage.removeItem('app_user_picture');
+                    localStorage.removeItem('app_migrated');
+                    window.location.reload();
+                }
+            });
+        }
 </script>
 
 </body>
