@@ -137,7 +137,6 @@
         }
 
         /* Mobile viewport frame simulation for desktop */
-        .modal-open { /* placeholder – JS handles padding */ }
         .modal-open .mobile-frame { overflow: hidden !important; }
         
         
@@ -378,7 +377,6 @@
         }
 
         /* Card and items background overrides */
-       }
 
         /* Card border overrides globally for clean Light Mode borders */
         .light-mode .border-slate-800,
@@ -437,7 +435,7 @@
 .light-mode .swal2-cancel {
     color: var(--text-primary) !important;
 }
-
+        .light-mode .mobile-frame {
             background-color: var(--bg-frame) !important;
             color: var(--text-primary) !important;
         }
@@ -703,7 +701,13 @@
                 ?>
                 <a href="<?= $activeCaborLink ?>" <?= $isComingSoon ? "onclick=\"showGlobalComingSoon('".esc($cabor)."'); return false;\"" : "" ?> class="flex flex-col items-center gap-1 group transition-all <?= $active_menu === 'scoring' ? 'text-'.$brandColor.'-400' : 'text-slate-500 hover:text-slate-300' ?>">
                     <div class="w-12 h-7 rounded-full flex items-center justify-center transition-all <?= $active_menu === 'scoring' ? 'bg-'.$brandColor.'-500/20' : 'group-hover:bg-slate-800/30' ?>">
-                        <i class='bx <?= $caborLower === 'bulutangkis' ? 'bx-tennis-ball' : 'bx-target-lock' ?> text-xl'></i>
+                        <?php if ($caborLower === 'bulutangkis'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-xl">
+                                <path d="M12 2v2"/><path d="m8.5 3 1.5 2"/><path d="m15.5 3-1.5 2"/><path d="M12 21a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/><path d="m5.5 13 4-8.5"/><path d="m18.5 13-4-8.5"/><path d="M5.5 13c1.7 0 2.5 1.5 3.5 3.5"/><path d="M18.5 13c-1.7 0-2.5 1.5-3.5 3.5"/>
+                            </svg>
+                        <?php else: ?>
+                            <i class='bx bx-target-lock text-xl'></i>
+                        <?php endif; ?>
                     </div>
                     <span class="text-[10px] font-semibold tracking-wide">Scoring</span>
                 </a>

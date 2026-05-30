@@ -31,7 +31,7 @@
         ],
         [
             'name' => 'Bulutangkis', 
-            'icon' => 'bx-tennis-ball', 
+            'icon' => 'shuttlecock', 
             'gradient' => 'from-emerald-500 via-teal-500 to-cyan-600', 
             'shadow' => 'shadow-teal-500/40',
             'desc' => 'Scoring Rally Point'
@@ -52,14 +52,26 @@
         <div class="absolute inset-0 opacity-20 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjIiIGZpbGw9IiNmZmZmZmYiLz48L3N2Zz4=')] bg-[length:16px_16px] group-hover:scale-110 transition-transform duration-700"></div>
         
         <!-- Giant Background Icon -->
-        <i class='bx <?= $sport['icon'] ?> absolute -bottom-6 -right-4 text-9xl text-white/10 group-hover:text-white/20 group-hover:rotate-12 transition-all duration-700'></i>
+        <?php if ($sport['icon'] === 'shuttlecock'): ?>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="absolute -bottom-6 -right-4 w-32 h-32 text-white/10 group-hover:text-white/20 group-hover:rotate-12 transition-all duration-700">
+                <path d="M12 2v2"/><path d="m8.5 3 1.5 2"/><path d="m15.5 3-1.5 2"/><path d="M12 21a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/><path d="m5.5 13 4-8.5"/><path d="m18.5 13-4-8.5"/><path d="M5.5 13c1.7 0 2.5 1.5 3.5 3.5"/><path d="M18.5 13c-1.7 0-2.5 1.5-3.5 3.5"/>
+            </svg>
+        <?php else: ?>
+            <i class='bx <?= $sport['icon'] ?> absolute -bottom-6 -right-4 text-9xl text-white/10 group-hover:text-white/20 group-hover:rotate-12 transition-all duration-700'></i>
+        <?php endif; ?>
 
         <!-- Content Container (Glassmorphic) -->
         <div class="relative z-10 flex items-center justify-between">
             <div>
                 <!-- Icon Box -->
                 <div class="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white mb-4 shadow-inner group-hover:bg-white/30 transition-colors duration-300">
-                    <i class='bx <?= $sport['icon'] ?> text-3xl group-hover:scale-110 transition-transform duration-300'></i>
+                    <?php if ($sport['icon'] === 'shuttlecock'): ?>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-3xl group-hover:scale-110 transition-transform duration-300">
+                            <path d="M12 2v2"/><path d="m8.5 3 1.5 2"/><path d="m15.5 3-1.5 2"/><path d="M12 21a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/><path d="m5.5 13 4-8.5"/><path d="m18.5 13-4-8.5"/><path d="M5.5 13c1.7 0 2.5 1.5 3.5 3.5"/><path d="M18.5 13c-1.7 0-2.5 1.5-3.5 3.5"/>
+                        </svg>
+                    <?php else: ?>
+                        <i class='bx <?= $sport['icon'] ?> text-3xl group-hover:scale-110 transition-transform duration-300'></i>
+                    <?php endif; ?>
                 </div>
                 
                 <h3 class="text-2xl font-black text-white tracking-wide mb-1 drop-shadow-md"><?= esc($sport['name']) ?></h3>
