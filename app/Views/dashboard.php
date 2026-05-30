@@ -285,9 +285,8 @@
     </div>
 </div>
 
-<!-- Load Chart.js CDN -->
+<!-- Load Chart.js CDN is now in main.php -->
 <?php if ($totalGames > 0 || $totalShots > 0): ?>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     (function() {
         const isLightMode = document.documentElement.classList.contains('light-mode');
@@ -302,6 +301,9 @@
         <?php if ($totalGames > 0): ?>
         const ctxLine = document.getElementById('dashboardChart');
         if (ctxLine) {
+            let existingChart = Chart.getChart(ctxLine);
+            if (existingChart) existingChart.destroy();
+            
             new Chart(ctxLine.getContext('2d'), {
                 type: 'line',
                 data: {
@@ -347,6 +349,9 @@
         <?php if (count(json_decode($topAthleteLabels)) > 0): ?>
         const ctxBar = document.getElementById('topAthleteChart');
         if (ctxBar) {
+            let existingBar = Chart.getChart(ctxBar);
+            if (existingBar) existingBar.destroy();
+
             new Chart(ctxBar.getContext('2d'), {
                 type: 'bar',
                 data: {

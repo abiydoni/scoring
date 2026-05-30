@@ -57,6 +57,8 @@
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Chart.js (Global Load for PJAX) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Google Identity Services (One Tap) -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <!-- Immediately check and apply the saved theme before HTML parses to prevent theme flashes -->
@@ -905,10 +907,64 @@
         });
 
         function showAppInstallPrompt() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    deferredPrompt = null;
+            if (deferredPrompt && !sessionStorage.getItem('pwa_prompt_dismissed')) {
+                // Hapus jika sudah ada banner sebelumnya
+                const existing = document.getElementById('premium-install-banner');
+                if (existing) existing.remove();
+
+                // Buat custom floating banner
+                const banner = document.createElement('div');
+                banner.id = 'premium-install-banner';
+                banner.className = `fixed bottom-24 left-4 right-4 z-50 transform translate-y-20 opacity-0 transition-all duration-700 ease-out flex items-center p-4 rounded-3xl shadow-[0_10px_40px_-10px_rgba(139,92,246,0.4)]
+                                    bg-slate-900/95 backdrop-blur-xl border border-brand-500/40`;
+
+                banner.innerHTML = `
+                    <div class="relative w-12 h-12 shrink-0 rounded-2xl bg-gradient-to-tr from-brand-600 to-sky-400 flex items-center justify-center shadow-lg border border-white/20">
+                        <i class='bx bx-download text-2xl text-white animate-bounce'></i>
+                        <span class="absolute top-0 right-0 w-3 h-3 bg-rose-500 border-2 border-slate-900 rounded-full animate-ping"></span>
+                        <span class="absolute top-0 right-0 w-3 h-3 bg-rose-500 border-2 border-slate-900 rounded-full"></span>
+                    </div>
+                    <div class="ml-3 flex-1">
+                        <h4 class="text-white text-sm font-black tracking-wide leading-tight">Install Aplikasi</h4>
+                        <p class="text-[10px] text-slate-300 font-medium leading-tight mt-0.5">Akses lebih cepat & hemat kuota!</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button id="btn-install-pwa" class="relative group px-4 py-2 bg-gradient-to-r from-brand-500 to-brand-400 text-white rounded-xl text-xs font-bold shadow-md hover:shadow-brand-500/50 hover:scale-105 transition-all">
+                            <span class="relative z-10">INSTALL</span>
+                            <div class="absolute inset-0 h-full w-full rounded-xl bg-white/20 animate-pulse"></div>
+                        </button>
+                        <button id="btn-close-pwa" class="w-8 h-8 rounded-full bg-slate-800/80 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 flex items-center justify-center transition-all">
+                            <i class='bx bx-x text-lg'></i>
+                        </button>
+                    </div>
+                `;
+
+                // Append ke DOM
+                document.querySelector('.mobile-frame').appendChild(banner);
+
+                // Trigger animation in
+                setTimeout(() => {
+                    banner.classList.remove('translate-y-20', 'opacity-0');
+                    banner.classList.add('translate-y-0', 'opacity-100');
+                }, 100);
+
+                // Event Listeners
+                document.getElementById('btn-install-pwa').addEventListener('click', () => {
+                    banner.classList.add('translate-y-20', 'opacity-0');
+                    setTimeout(() => banner.remove(), 700);
+                    
+                    if (deferredPrompt) {
+                        deferredPrompt.prompt();
+                        deferredPrompt.userChoice.then((choiceResult) => {
+                            deferredPrompt = null;
+                        });
+                    }
+                });
+
+                document.getElementById('btn-close-pwa').addEventListener('click', () => {
+                    banner.classList.add('translate-y-20', 'opacity-0');
+                    sessionStorage.setItem('pwa_prompt_dismissed', 'true');
+                    setTimeout(() => banner.remove(), 700);
                 });
             }
         }
@@ -1009,13 +1065,21 @@
                         google.accounts.id.initialize({
                             client_id: '215408546614-3et2rjsrmlm1pbt1q9m9emb4rv0l5g9j.apps.googleusercontent.com',
                             callback: handleGoogleCredentialResponse,
-                            cancel_on_tap_outside: false
+                            cancel_on_tap_outside: false,
+                            use_fedcm_for_prompt: true
                         });
                         google.accounts.id.prompt((notification) => {
-                            if (notification.isNotDisplayed() || notification.isSkippedMoment() || notification.isDismissedMoment()) {
-                                console.log('OneTap closed or failed, showing manual login');
+                            const reason = notification.getNotDisplayedReason?.() ||
+                                           notification.getSkippedReason?.() ||
+                                           notification.getDismissedReason?.() || 'unknown';
+                            console.log('[Google One Tap] moment:', notification.getMomentType?.(), '| reason:', reason);
+
+                            if (notification.isNotDisplayed()) {
+                                // Truly blocked (e.g. third-party cookies, suppressed) -> fallback
+                                console.warn('[Google One Tap] Not displayed. Reason:', reason);
                                 showManualEmailLogin();
                             }
+                            // isSkippedMoment / isDismissedMoment = user closed it intentionally, don't force manual
                         });
                     } else {
                         setTimeout(initGoogle, 100);
@@ -1024,6 +1088,7 @@
                 initGoogle();
             } else {
                 recordUserOnline(email);
+                setTimeout(showAppInstallPrompt, 1500);
             }
         }
 
@@ -1106,34 +1171,34 @@
 </script>
 
 <!-- Global Athlete Stats Modal -->
-<div id="athlete-stats-modal" class="fixed inset-0 z-[90] hidden flex items-center justify-center bg-black/60 backdrop-blur-md transition-opacity opacity-0" onclick="closeAthleteStats(event)">
-    <div class="bg-slate-900 border border-slate-700/50 rounded-[2rem] w-full max-w-sm mx-4 overflow-hidden shadow-2xl relative transform scale-95 transition-transform duration-300">
+<div id="athlete-stats-modal" class="fixed inset-0 z-[90] hidden flex items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity opacity-0 p-4" onclick="closeAthleteStats(event)">
+    <div class="bg-slate-900 border border-slate-700/50 rounded-3xl w-full max-w-[320px] relative transform scale-95 transition-transform duration-300 flex flex-col shadow-2xl">
+        
         <!-- Close Button -->
-        <button onclick="closeAthleteStats()" class="absolute top-4 right-4 w-8 h-8 bg-slate-800/80 hover:bg-rose-600 text-white rounded-full flex items-center justify-center transition-all z-10 shadow-lg">
+        <button onclick="closeAthleteStats()" class="absolute top-3 right-3 w-8 h-8 bg-slate-800 hover:bg-rose-500/10 text-slate-400 hover:text-rose-500 rounded-full flex items-center justify-center transition-all z-20">
             <i class='bx bx-x text-xl'></i>
         </button>
-        
-        <!-- Header -->
-        <div class="px-6 pt-8 pb-6 bg-gradient-to-br from-slate-800/80 to-slate-900 text-center relative overflow-hidden border-b border-slate-800">
-            <div class="absolute -right-8 -top-8 w-32 h-32 bg-brand-500/10 rounded-full blur-2xl"></div>
-            
-            <div class="w-20 h-20 mx-auto rounded-full bg-slate-800 border-[3px] border-slate-700 flex items-center justify-center text-3xl font-black text-slate-300 shadow-xl overflow-hidden relative z-10" id="stats-avatar-container">
-                <!-- Avatar injected via JS -->
+
+        <div class="p-5 pt-6 flex flex-col items-center">
+            <!-- Photo -->
+            <div class="w-20 h-20 rounded-full bg-slate-800 border-2 border-slate-700 shadow-md flex items-center justify-center text-3xl font-black text-slate-500 overflow-hidden mb-3" id="stats-avatar-container">
+                <!-- Avatar -->
             </div>
+
+            <!-- Name & Info -->
+            <h3 class="text-lg font-bold text-white text-center leading-tight mb-1" id="stats-nama">Memuat...</h3>
+            <p class="text-[10px] text-brand-400 font-bold uppercase tracking-widest mb-3" id="stats-cabor">Cabor</p>
             
-            <h3 class="text-xl font-black text-white mt-4 tracking-wide" id="stats-nama">Memuat...</h3>
-            <p class="text-xs text-brand-400 font-bold uppercase tracking-widest mt-1" id="stats-cabor">Cabor</p>
-            
-            <div class="flex items-center justify-center gap-2 mt-3 text-[10px] font-bold text-slate-400" id="stats-badges">
-                <!-- Badges injected via JS -->
+            <div class="flex flex-wrap justify-center gap-1.5 mb-4 w-full" id="stats-badges">
+                <!-- Badges -->
             </div>
-        </div>
-        
-        <!-- Stats Grid -->
-        <div class="p-5 bg-slate-950" id="stats-grid-container">
-            <!-- Loading State -->
-            <div class="flex justify-center py-8">
-                <i class='bx bx-loader-alt animate-spin text-4xl text-brand-500'></i>
+
+            <!-- Stats Grid -->
+            <div class="w-full" id="stats-grid-container">
+                <!-- Loading State -->
+                <div class="flex justify-center py-4">
+                    <i class='bx bx-loader-alt animate-spin text-2xl text-brand-500'></i>
+                </div>
             </div>
         </div>
     </div>
@@ -1177,88 +1242,71 @@
                     const atlet = data.atlet;
                     
                     namaEl.textContent = atlet.nama;
-                    
                     if (atlet.foto) {
-                        avatarContainer.innerHTML = `<img src="/uploads/anggota/${atlet.foto}" class="w-full h-full object-cover cursor-pointer" onclick="showImageModal('/uploads/anggota/${atlet.foto}')">`;
+                        avatarContainer.innerHTML = `<img src="/uploads/anggota/${atlet.foto}" class="w-full h-full object-cover cursor-pointer hover:opacity-80 transition-opacity" onclick="showImageModal('/uploads/anggota/${atlet.foto}')">`;
                     } else {
-                        avatarContainer.innerHTML = `<span class="text-brand-400">${atlet.nama.substring(0,2).toUpperCase()}</span>`;
+                        avatarContainer.innerHTML = `<span>${atlet.nama.substring(0,2).toUpperCase()}</span>`;
                     }
                     
                     let badgesHtml = '';
                     if (atlet.jenis_kelamin) {
                         const icon = atlet.jenis_kelamin === 'L' ? 'bx-male text-sky-400' : 'bx-female text-pink-400';
-                        badgesHtml += `<span class="px-2 py-0.5 rounded-full bg-slate-800 border border-slate-700 flex items-center gap-1"><i class='bx ${icon} text-sm'></i> ${atlet.jenis_kelamin === 'L' ? 'Laki-Laki' : 'Perempuan'}</span>`;
+                        const text = atlet.jenis_kelamin === 'L' ? 'Putra' : 'Putri';
+                        badgesHtml += `<span class="px-2 py-0.5 rounded-full bg-slate-800 border border-slate-700 flex items-center gap-1 text-[9px] font-bold text-slate-300"><i class='bx ${icon} text-xs'></i> ${text}</span>`;
                     }
                     if (atlet.klub) {
-                        badgesHtml += `<span class="px-2 py-0.5 rounded-full bg-slate-800 border border-slate-700 flex items-center gap-1"><i class='bx bx-building-house text-sm'></i> ${atlet.klub}</span>`;
+                        badgesHtml += `<span class="px-2 py-0.5 rounded-full bg-slate-800 border border-slate-700 flex items-center gap-1 text-[9px] font-bold text-slate-300"><i class='bx bx-building-house text-brand-400 text-xs'></i> ${atlet.klub}</span>`;
                     }
                     badgesEl.innerHTML = badgesHtml;
                     
                     const colorMap = {
-                        'indigo': { bg: 'from-indigo-500/10 to-indigo-600/20', border: 'border-indigo-500/30', text: 'text-indigo-400' },
-                        'emerald': { bg: 'from-emerald-500/10 to-emerald-600/20', border: 'border-emerald-500/30', text: 'text-emerald-400' },
-                        'amber': { bg: 'from-amber-500/10 to-amber-600/20', border: 'border-amber-500/30', text: 'text-amber-400' },
-                        'rose': { bg: 'from-rose-500/10 to-rose-600/20', border: 'border-rose-500/30', text: 'text-rose-400' }
+                        'indigo': { bg: 'bg-indigo-500/10', border: 'border-indigo-500/20', label: 'text-indigo-400', circle: 'bg-indigo-500' },
+                        'emerald': { bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', label: 'text-emerald-400', circle: 'bg-emerald-500' },
+                        'amber': { bg: 'bg-amber-500/10', border: 'border-amber-500/20', label: 'text-amber-400', circle: 'bg-amber-500' },
+                        'rose': { bg: 'bg-rose-500/10', border: 'border-rose-500/20', label: 'text-rose-400', circle: 'bg-rose-500' }
                     };
-                    
-                    let gridHtml = '<div class="grid grid-cols-2 gap-3">';
+
+                    let gridHtml = '<div class="grid grid-cols-2 gap-2 mb-3">';
                     data.stats.forEach(stat => {
                         const c = colorMap[stat.color] || colorMap['indigo'];
                         gridHtml += `
-                            <div class="bg-gradient-to-br ${c.bg} border ${c.border} p-4 rounded-[1.25rem] text-center shadow-inner hover:scale-105 transition-transform cursor-default flex flex-col justify-center min-h-[90px]">
-                                <span class="text-[9px] font-bold ${c.text} uppercase tracking-widest block mb-1 leading-tight">${stat.label}</span>
-                                <span class="text-2xl font-black text-white drop-shadow-md leading-none">${stat.value}</span>
+                            <div class="${c.bg} border ${c.border} p-2 rounded-2xl flex flex-col items-center justify-between min-h-[85px]">
+                                <span class="text-[8px] font-black ${c.label} uppercase tracking-widest text-center mt-1">${stat.label}</span>
+                                <div class="w-10 h-10 rounded-full ${c.circle} flex items-center justify-center shadow-md mb-1 border-2 border-white/10">
+                                    <span class="text-base font-black text-white leading-none">${stat.value}</span>
+                                </div>
                             </div>
                         `;
                     });
+                    gridHtml += '</div>';
                     
                     if (data.shot_stats) {
                         gridHtml += `
-                            <div class="col-span-2 mt-2 bg-slate-900 border border-slate-800 rounded-3xl shadow-inner overflow-hidden">
-                                <div class="bg-slate-800/50 py-2 border-b border-slate-700/50">
-                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block text-center">Distribusi Anak Panah</span>
+                            <div class="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-2.5 text-center">
+                                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest block mb-2">Akurasi Panah</span>
+                                <div class="grid grid-cols-6 gap-1">
+                        `;
+                        
+                        const keys = ['X', '10', '9', '8', '7', '6', '5', '4', '3', '2', '1', 'M'];
+                        keys.forEach(k => {
+                            let colorClass = 'text-slate-400';
+                            if (['X', '10', '9'].includes(k)) colorClass = 'text-amber-400';
+                            else if (['8', '7'].includes(k)) colorClass = 'text-rose-400';
+                            else if (['6', '5'].includes(k)) colorClass = 'text-sky-400';
+                            
+                            gridHtml += `
+                                <div class="flex flex-col items-center bg-slate-900/50 border border-slate-700/30 rounded-lg py-1">
+                                    <span class="text-[8px] font-black ${colorClass}">${k}</span>
+                                    <span class="text-[10px] font-bold text-white mt-0.5">${data.shot_stats[k] || 0}</span>
                                 </div>
-                                <div class="overflow-x-auto no-scrollbar">
-                                    <table class="w-full text-center text-xs">
-                                        <thead>
-                                            <tr class="bg-slate-900 border-b border-slate-800">
-                                                <th class="py-2 px-1 font-black text-amber-500">X</th>
-                                                <th class="py-2 px-1 font-black text-amber-500">10</th>
-                                                <th class="py-2 px-1 font-black text-amber-500">9</th>
-                                                <th class="py-2 px-1 font-black text-rose-500">8</th>
-                                                <th class="py-2 px-1 font-black text-rose-500">7</th>
-                                                <th class="py-2 px-1 font-black text-sky-500">6</th>
-                                                <th class="py-2 px-1 font-black text-sky-500">5</th>
-                                                <th class="py-2 px-1 font-black text-slate-300">4</th>
-                                                <th class="py-2 px-1 font-black text-slate-300">3</th>
-                                                <th class="py-2 px-1 font-black text-slate-400">2</th>
-                                                <th class="py-2 px-1 font-black text-slate-400">1</th>
-                                                <th class="py-2 px-1 font-black text-slate-500">M</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr class="text-white font-bold bg-slate-950/50">
-                                                <td class="py-2 px-1">${data.shot_stats.X}</td>
-                                                <td class="py-2 px-1">${data.shot_stats['10']}</td>
-                                                <td class="py-2 px-1">${data.shot_stats['9']}</td>
-                                                <td class="py-2 px-1">${data.shot_stats['8']}</td>
-                                                <td class="py-2 px-1">${data.shot_stats['7']}</td>
-                                                <td class="py-2 px-1">${data.shot_stats['6']}</td>
-                                                <td class="py-2 px-1">${data.shot_stats['5']}</td>
-                                                <td class="py-2 px-1">${data.shot_stats['4']}</td>
-                                                <td class="py-2 px-1">${data.shot_stats['3']}</td>
-                                                <td class="py-2 px-1">${data.shot_stats['2']}</td>
-                                                <td class="py-2 px-1">${data.shot_stats['1']}</td>
-                                                <td class="py-2 px-1">${data.shot_stats.M}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                            `;
+                        });
+                        
+                        gridHtml += `
                                 </div>
                             </div>
                         `;
                     }
-                    
-                    gridHtml += '</div>';
                     
                     gridContainer.innerHTML = gridHtml;
                 } else {

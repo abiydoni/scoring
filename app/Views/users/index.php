@@ -2,11 +2,19 @@
 
 <?= $this->section('content') ?>
 
-<div class="mb-6">
-    <h2 class="text-xl font-bold bg-gradient-to-r from-white via-slate-100 to-slate-300 bg-clip-text text-transparent mb-1">
-        Pengguna Aktif
-    </h2>
-    <p class="text-sm text-slate-400">Daftar pengguna aplikasi dan status online terakhir.</p>
+<div class="mb-6 flex items-start justify-between gap-3">
+    <div>
+        <h2 class="text-xl font-bold bg-gradient-to-r from-white via-slate-100 to-slate-300 bg-clip-text text-transparent mb-1">
+            Pengguna Aktif
+        </h2>
+        <p class="text-sm text-slate-400">Daftar pengguna aplikasi dan status online terakhir.</p>
+    </div>
+    <?php if (!empty($users)): ?>
+        <button onclick="confirmClearAll()"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-rose-500/10 border border-rose-500/20 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 text-[10px] font-bold uppercase tracking-wider transition-all shrink-0">
+            <i class='bx bx-trash text-sm'></i> Hapus Semua
+        </button>
+    <?php endif; ?>
 </div>
 
 <div class="space-y-4">
@@ -51,7 +59,7 @@
                         <p class="text-[10px] text-slate-500 mt-0.5">Mendaftar: <?= date('d M Y', strtotime($user['created_at'])) ?></p>
                     </div>
                 </div>
-                <div class="text-right flex flex-col items-end">
+                <div class="text-right flex items-center gap-2">
                     <?php if ($isOnline): ?>
                         <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-bold uppercase tracking-wider">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -60,10 +68,54 @@
                     <?php else: ?>
                         <span class="text-xs font-semibold text-slate-400"><?= $statusText ?></span>
                     <?php endif; ?>
+                    <button onclick="confirmDelete(<?= $user['id'] ?>, '<?= esc($user['email']) ?>')"
+                        class="w-7 h-7 rounded-full bg-slate-700/50 hover:bg-rose-500/20 flex items-center justify-center text-slate-500 hover:text-rose-400 transition-all opacity-0 group-hover:opacity-100">
+                        <i class='bx bx-x text-base'></i>
+                    </button>
                 </div>
             </div>
         <?php endforeach; ?>
     <?php endif; ?>
 </div>
+
+<script>
+    function confirmDelete(id, email) {
+        Swal.fire({
+            title: 'Hapus User?',
+            html: `Hapus <strong>${email}</strong> dari daftar pengguna?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#475569',
+            confirmButtonText: 'Ya, Hapus',
+            cancelButtonText: 'Batal',
+            background: document.documentElement.classList.contains('light-mode') ? '#ffffff' : '#1e293b',
+            color: document.documentElement.classList.contains('light-mode') ? '#0f172a' : '#f8fafc',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = `/users/delete/${id}`;
+            }
+        });
+    }
+
+    function confirmClearAll() {
+        Swal.fire({
+            title: 'Hapus Semua User?',
+            text: 'Semua data pengguna akan dihapus permanen dari database!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#475569',
+            confirmButtonText: 'Ya, Hapus Semua',
+            cancelButtonText: 'Batal',
+            background: document.documentElement.classList.contains('light-mode') ? '#ffffff' : '#1e293b',
+            color: document.documentElement.classList.contains('light-mode') ? '#0f172a' : '#f8fafc',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '/users/clear-all';
+            }
+        });
+    }
+</script>
 
 <?= $this->endSection() ?>

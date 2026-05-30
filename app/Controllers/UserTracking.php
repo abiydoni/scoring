@@ -31,6 +31,21 @@ class UserTracking extends BaseController
         return $this->response->setJSON(['status' => 'success']);
     }
 
+    public function delete($id)
+    {
+        $userModel = new AppUserModel();
+        $userModel->delete($id);
+        return redirect()->to('/users')->with('success', 'User berhasil dihapus.');
+    }
+
+    public function clearAll()
+    {
+        $db = \Config\Database::connect();
+        $db->table('app_users')->truncate();
+        return redirect()->to('/users')->with('success', 'Semua data user berhasil dihapus.');
+    }
+
+
     public function index()
     {
         $userModel = new AppUserModel();
